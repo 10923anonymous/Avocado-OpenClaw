@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Driver 3D</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow: hidden;
+            background: #1a1a2e;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        #ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+        #menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            pointer-events: auto;
+            border: 2px solid #4a9eff;
+            box-shadow: 0 0 30px rgba(74, 158, 255, 0.5);
+        }
+        #menu h1 {
+            color: #4a9eff;
+            margin-bottom: 10px;
+            font-size: 3em;
+            text-shadow: 0 0 20px rgba(74, 158, 255, 0.8);
+        }
+        #menu p {
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+        .city-btn {
+            display: block;
+            width: 200px;
+            margin: 10px auto;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #4a9eff, #0066cc);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .city-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(74, 158, 255, 0.5);
+        }
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9em;
+            display: none;
+        }
+        #controls h3 {
+            color: #4a9eff;
+            margin-bottom: 10px;
+        }
+        #controls div {
+            margin: 5px 0;
+        }
+        #modeSwitch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+        .mode-btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .mode-btn.active {
+            background: #4a9eff;
+            color: white;
+        }
+        .mode-btn:not(.active) {
+            background: #333;
+            color: #aaa;
+        }
+        #speedometer {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            display: none;
+        }
+        #speed {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4a9eff;
+        }
+        #speedLabel {
+            font-size: 0.8em;
+            color: #aaa;
+        }
+        #minimap {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 200px;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            border: 2px solid #4a9eff;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="ui">
+            <div id="menu">
+                <h1>🌆 City Driver 3D</h1>
+                <p>Choose your city to explore</p>
+                <button class="city-btn" onclick="startGame('tokyo')">🇯🇵 Tokyo</button>
+                <button class="city-btn" onclick="startGame('nyc')">🇺🇸 New York</button>
+                <button class="city-btn" onclick="startGame('london')">🇬🇧 London</button>
+                <button class="city-btn" onclick="startGame('paris')">🇫🇷 Paris</button>
+                <button class="city-btn" onclick="startGame('dubai')">🇦🇪 Dubai</button>
+            </div>
+            
+            <div id="controls">
+                <h3>Controls</h3>
+                <div>🚗 <b>WASD / Arrows</b> - Drive</div>
+                <div>🚶 <b>Space</b> - Exit vehicle</div>
+                <div>🚴 <b>B</b> - Switch to bike</div>
+                <div>🔄 <b>R</b> - Reset position</div>
+                <div>📷 <b>C</b> - Change camera</div>
+                <div>⏸️ <b>ESC</b> - Pause menu</div>
+            </div>
+            
+            <div id="modeSwitch">
+                <button class="mode-btn active" id="driveBtn" onclick="setMode('drive')">🚗 Drive</button>
+                <button class="mode-btn" id="walkBtn" onclick="setMode('walk')">🚶 Walk</button>
+                <button class="mode-btn" id="bikeBtn" onclick="setMode('bike')">🚴 Bike</button>
+            </div>
+            
+            <div id="speedometer">
+                <span id="speed">0</span>
+                <span id="speedLabel">km/h</span>
+            </div>
+            
+            <canvas id="minimap"></canvas>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>

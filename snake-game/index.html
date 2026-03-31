@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Snake Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <section class="game-card">
+        <h1 class="title">Snake Game</h1>
+        <div class="score-row">
+          <span id="score-label">Score:</span>
+          <span id="score-value">0</span>
+          <span id="highscore-label">Best:</span>
+          <span id="highscore-value">0</span>
+        </div>
+        <div class="board-controls">
+          <label for="boardSize" class="board-label">Board</label>
+          <input
+            id="boardSize"
+            class="board-slider"
+            type="range"
+            min="10"
+            max="50"
+            value="20"
+          />
+          <span id="boardSizeValue" class="board-size-value">20×20</span>
+        </div>
+        <div class="board-controls">
+          <label for="wallCount" class="board-label">Walls</label>
+          <input
+            id="wallCount"
+            class="board-slider"
+            type="range"
+            min="0"
+            max="7"
+            value="3"
+          />
+          <span id="wallCountValue" class="board-size-value">3</span>
+        </div>
+        <div class="board-controls">
+          <label for="aiRivalCount" class="board-label">AI rivals</label>
+          <input
+            id="aiRivalCount"
+            class="board-slider"
+            type="range"
+            min="0"
+            max="3"
+            value="1"
+          />
+          <span id="aiRivalCountValue" class="board-size-value">1</span>
+        </div>
+        <div class="board-controls">
+          <label for="aiObstacleCount" class="board-label">AI obstacles</label>
+          <input
+            id="aiObstacleCount"
+            class="board-slider"
+            type="range"
+            min="0"
+            max="3"
+            value="2"
+          />
+          <span id="aiObstacleCountValue" class="board-size-value">2</span>
+        </div>
+        <div class="board-controls">
+          <label for="humanSpeed" class="board-label">Human speed</label>
+          <input
+            id="humanSpeed"
+            class="board-slider"
+            type="range"
+            min="0"
+            max="3"
+            value="1"
+          />
+          <span id="humanSpeedValue" class="board-size-value">1×</span>
+        </div>
+        <div class="board-controls">
+          <button type="button" id="humansToggle" class="game-toggle">
+            Humans: on
+          </button>
+        </div>
+        <div class="board-controls">
+          <button type="button" id="customizeBtn" class="game-toggle customize-btn">
+            🎨 Customize Colors
+          </button>
+        </div>
+        <div class="canvas-wrapper">
+          <canvas id="gameCanvas" width="400" height="400">
+            Your browser does not support the HTML canvas tag.
+          </canvas>
+          <div id="gameOver" class="game-over hidden">
+            <div class="game-over-content">
+              <h2>Game Over</h2>
+              <p>Your score: <span id="finalScore">0</span></p>
+              <button id="restartButton" type="button">Play Again</button>
+            </div>
+          </div>
+        </div>
+        <p class="hint">Use the arrow keys (or WASD) to move.</p>
+      </section>
+    </main>
+
+    <!-- Customize Modal -->
+    <div id="customizeModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>🎨 Customize Colors</h2>
+          <button type="button" class="close-btn" id="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="color-option">
+            <label for="snakeColor">Your Snake</label>
+            <div class="color-input-wrapper">
+              <input type="color" id="snakeColor" value="#4ade80" />
+              <span class="color-value" id="snakeColorValue">#4ade80</span>
+            </div>
+          </div>
+          <div class="color-option">
+            <label for="aiSnakeColor">AI Snakes</label>
+            <div class="color-input-wrapper">
+              <input type="color" id="aiSnakeColor" value="#f87171" />
+              <span class="color-value" id="aiSnakeColorValue">#f87171</span>
+            </div>
+          </div>
+          <div class="color-option">
+            <label for="wallColor">Walls</label>
+            <div class="color-input-wrapper">
+              <input type="color" id="wallColor" value="#78716c" />
+              <span class="color-value" id="wallColorValue">#78716c</span>
+            </div>
+          </div>
+          <div class="color-option">
+            <label for="bgColor">Background</label>
+            <div class="color-input-wrapper">
+              <input type="color" id="bgColor" value="#1c1917" />
+              <span class="color-value" id="bgColorValue">#1c1917</span>
+            </div>
+          </div>
+          <div class="color-option">
+            <label for="foodColor">Food</label>
+            <div class="color-input-wrapper">
+              <input type="color" id="foodColor" value="#fbbf24" />
+              <span class="color-value" id="foodColorValue">#fbbf24</span>
+            </div>
+          </div>
+          <div class="color-option">
+            <label for="gridColor">Grid Lines</label>
+            <div class="color-input-wrapper">
+              <input type="color" id="gridColor" value="#292524" />
+              <span class="color-value" id="gridColorValue">#292524</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="resetColors" class="reset-btn">Reset to Default</button>
+          <button type="button" id="saveColors" class="save-btn">Save & Close</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="game.js"></script>
+  </body>
+</html>

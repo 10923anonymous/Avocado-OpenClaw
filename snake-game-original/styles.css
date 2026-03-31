@@ -1,0 +1,361 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #243b55 0, #141e30 45%, #050608 100%);
+  color: #f9fafb;
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.game-card {
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 16px;
+  padding: 24px 28px 28px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+}
+
+.title {
+  margin: 0 0 12px;
+  font-size: 1.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.score-row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.15);
+  border: 1px solid rgba(34, 197, 154, 0.35);
+}
+
+#score-label {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #a5b4fc;
+}
+
+#score-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #f97316;
+}
+
+#highscore-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #bfdbfe;
+  margin-left: 10px;
+}
+
+#highscore-value {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #facc15;
+}
+
+.board-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #e5e7eb;
+}
+
+.board-label {
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9);
+}
+
+.board-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 120px;
+  height: 10px;
+  border-radius: 999px;
+  background: repeating-linear-gradient(
+    to right,
+    #020617 0,
+    #020617 4px,
+    #0f172a 4px,
+    #0f172a 8px
+  );
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  box-shadow: inset 0 0 0 1px #020617;
+}
+
+.board-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: #f97316;
+  box-shadow: 0 0 0 2px #000, 0 0 10px rgba(249, 115, 22, 0.9);
+  cursor: pointer;
+}
+
+.board-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: #f97316;
+  box-shadow: 0 0 0 2px #000, 0 0 10px rgba(249, 115, 22, 0.9);
+  cursor: pointer;
+}
+
+.board-size-value {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, "Liberation Mono", "Courier New", monospace;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  color: #a5b4fc;
+}
+
+.game-toggle {
+  appearance: none;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba(15, 23, 42, 0.95);
+  color: #e5e7eb;
+  transition: transform 0.08s ease-out, filter 0.08s ease-out, box-shadow 0.08s ease-out;
+}
+
+.game-toggle:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.game-toggle--on {
+  border-color: rgba(34, 197, 154, 0.55);
+  box-shadow: 0 0 0 1px rgba(34, 197, 154, 0.25);
+  color: #bbf7d0;
+}
+
+.game-toggle--off {
+  border-color: rgba(248, 113, 113, 0.45);
+  box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.2);
+  color: #fecaca;
+}
+
+.game-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  transform: none;
+}
+
+.canvas-wrapper {
+  position: relative;
+  margin-inline: auto;
+  width: min(400px, 90vw);
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.55);
+  background: linear-gradient(180deg, #6ecff5 0%, #8bc34a 38%, #33691e 100%);
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.game-over {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.2), rgba(15, 23, 42, 0.88));
+  backdrop-filter: blur(4px);
+}
+
+.game-over.hidden {
+  display: none;
+}
+
+.game-over-content {
+  background: rgba(15, 23, 42, 0.98);
+  border-radius: 16px;
+  padding: 20px 22px 18px;
+  border: 1px solid rgba(248, 250, 252, 0.06);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+  min-width: 220px;
+}
+
+.game-over-content h2 {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+}
+
+.game-over-content p {
+  margin: 0 0 16px;
+  font-size: 0.98rem;
+  color: #e5e7eb;
+}
+
+#finalScore {
+  font-weight: 600;
+  color: #f97316;
+}
+
+#restartButton {
+  appearance: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #022c22;
+  box-shadow: 0 12px 22px rgba(16, 185, 129, 0.55);
+  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out, filter 0.08s ease-out;
+}
+
+#restartButton:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(16, 185, 129, 0.65);
+}
+
+#restartButton:active {
+  transform: translateY(1px);
+  box-shadow: 0 8px 16px rgba(16, 185, 129, 0.5);
+}
+
+.hint {
+  margin: 14px 0 0;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+@media (max-width: 480px) {
+  .game-card {
+    padding: 20px 18px 22px;
+  }
+
+  .title {
+    font-size: 1.4rem;
+  }
+}
+
+
+/* Color Picker Styles */
+.color-picker-panel {
+  background: rgba(30, 41, 59, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 12px 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.color-picker-panel.hidden {
+  display: none;
+}
+
+.color-section {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.color-section:last-of-type {
+  border-bottom: none;
+}
+
+.color-section h3 {
+  margin: 0 0 10px 0;
+  font-size: 0.95rem;
+  color: #94a3b8;
+  text-align: left;
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 8px 0;
+  padding: 4px 8px;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 6px;
+}
+
+.color-row label {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+}
+
+.color-row input[type="color"] {
+  width: 50px;
+  height: 28px;
+  border: 2px solid rgba(148, 163, 184, 0.3);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.color-row input[type="color"]:hover {
+  border-color: rgba(148, 163, 184, 0.6);
+}
+
+.color-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.color-actions button {
+  flex: 1;
+}
