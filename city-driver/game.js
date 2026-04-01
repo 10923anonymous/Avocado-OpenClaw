@@ -5,7 +5,7 @@ let city = [], traffic = [], pedestrians = [], buildings = [];
 let currentMode = 'drive', currentCity = 'tokyo', isGameActive = false;
 let vehicleSpeed = 0, vehicleRotation = 0;
 
-const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
+const keys = { w: false, a: false, s: false, d: false, W: false, A: false, S: false, D: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, " ": false };
 const maxSpeed = { drive: 0.8, bike: 0.5, walk: 0.1 };
 const acceleration = 0.02, friction = 0.95, turnSpeed = 0.03;
 
@@ -259,9 +259,9 @@ function updateVehicle() {
     let activeMesh = currentMode === 'drive' ? vehicle : currentMode === 'bike' ? bike : playerMesh;
     if (!activeMesh) return;
     
-    // Acceleration
-    if (keys.w || keys.ArrowUp) vehicleSpeed += acceleration;
-    else if (keys.s || keys.ArrowDown) vehicleSpeed -= acceleration;
+    // Acceleration - check both lowercase and uppercase
+    if (keys.w || keys.W || keys.ArrowUp) vehicleSpeed += acceleration;
+    else if (keys.s || keys.S || keys.ArrowDown) vehicleSpeed -= acceleration;
     
     // Friction
     vehicleSpeed *= friction;
@@ -271,10 +271,10 @@ function updateVehicle() {
     if (vehicleSpeed < -currentMaxSpeed / 2) vehicleSpeed = -currentMaxSpeed / 2;
     if (Math.abs(vehicleSpeed) < 0.001) vehicleSpeed = 0;
     
-    // Turning
+    // Turning - check both lowercase and uppercase
     if (Math.abs(vehicleSpeed) > 0.01) {
-        if (keys.a || keys.ArrowLeft) vehicleRotation += turnSpeed * (vehicleSpeed > 0 ? 1 : -1);
-        if (keys.d || keys.ArrowRight) vehicleRotation -= turnSpeed * (vehicleSpeed > 0 ? 1 : -1);
+        if (keys.a || keys.A || keys.ArrowLeft) vehicleRotation += turnSpeed * (vehicleSpeed > 0 ? 1 : -1);
+        if (keys.d || keys.D || keys.ArrowRight) vehicleRotation -= turnSpeed * (vehicleSpeed > 0 ? 1 : -1);
     }
     
     // Calculate new position
@@ -360,7 +360,21 @@ function resetPosition() {
 function onKeyDown(e) {
     if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
     if (keys.hasOwnProperty(e.code)) keys[e.code] = true;
-    if (e.key === 'b' || e.key === 'B') setMode('bike');
+    
+    // Mode switching
+    if (e.key === 'b' || e.key === 'B') {
+        e.preventDefault();
+        setMode('bike');
+    }
+    if (e.key === ' ') {
+        e.preventDefault();
+        setMode('walk');
+    }
+    if (e.key === 'e' || e.key === 'E') {
+        e.preventDefault();
+        setMode('drive');
+    }
+    
     if (e.key === 'r' || e.key === 'R') resetPosition();
     if (e.key === 'c' || e.key === 'C') changeCamera();
     if (e.key === 'Escape') {
@@ -373,6 +387,10 @@ function onKeyUp(e) {
     if (keys.hasOwnProperty(e.key)) keys[e.key] = false;
     if (keys.hasOwnProperty(e.code)) keys[e.code] = false;
 }
+
+// Camera variables
+let cameraMode = 'follow';
+let cameraOffset = { x: 0, y: 15, z: 30 };
 
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
