@@ -714,7 +714,9 @@
                 document.getElementById('calcSection').style.display = 'flex';
                 document.getElementById('converterSection').style.display = 'none';
                 document.getElementById('converterSection').classList.remove('active');
-                document.querySelectorAll('.scientific-extra').forEach(b => b.style.display = tab === 'scientific' ? 'flex' : 'none');
+                document.querySelectorAll('.scientific-extra').forEach(b => {
+                    b.classList.toggle('visible', tab === 'scientific');
+                });
             }
         }
 
@@ -784,17 +786,7 @@
 
         function toggleSign() { currentInput = (parseFloat(currentInput) * -1).toString(); updateDisplay(); }
 
-        document.getElementById('standardTab').addEventListener('click', function() {
-            this.classList.add('active');
-            document.getElementById('scientificTab').classList.remove('active');
-            document.querySelectorAll('.scientific-extra').forEach(btn => btn.classList.remove('visible'));
-        });
 
-        document.getElementById('scientificTab').addEventListener('click', function() {
-            this.classList.add('active');
-            document.getElementById('standardTab').classList.remove('active');
-            document.querySelectorAll('.scientific-extra').forEach(btn => btn.classList.add('visible'));
-        });
 
         function setConvType(type) {
             currentConvType = type;
