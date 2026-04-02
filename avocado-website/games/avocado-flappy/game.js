@@ -9,6 +9,7 @@ const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 // Pre-load audio files
 const splatSound = new Audio('splat.mp3');
+splatSound.preload = 'auto';
 
 function playJumpSound() {
     const oscillator = audioContext.createOscillator();
@@ -29,8 +30,10 @@ function playJumpSound() {
 
 function playSplatSound() {
     // Play the MP3 sound effect
-    splatSound.currentTime = 0;
-    splatSound.play().catch(e => console.log('Audio play failed:', e));
+    if (splatSound.readyState >= 2) {
+        splatSound.currentTime = 0;
+        splatSound.play().catch(e => console.log('Audio play failed:', e));
+    }
 }
 
 let gameState = 'start'; // start, playing, gameOver
