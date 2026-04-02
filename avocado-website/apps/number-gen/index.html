@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=800, height=480, initial-scale=1.0, user-scalable=no">
+    <title>🎲 Number Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { width: 800px; height: 480px; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #1a3d1a 0%, #2d5016 30%, #3d6b1f 50%, #90c040 70%, #c4d600 100%); color: #fff; }
+        .back-button { position: fixed; top: 10px; left: 10px; padding: 8px 14px; background: linear-gradient(135deg, #2d5016, #3d6b1f); border: 2px solid #fff; border-radius: 10px; color: #fff; text-decoration: none; font-size: 13px; font-weight: bold; z-index: 10000; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); }
+        .fullscreen-btn { position: fixed; top: 10px; right: 10px; padding: 8px 12px; background: linear-gradient(135deg, #2d5016, #3d6b1f); border: 2px solid #fff; border-radius: 10px; color: #fff; font-size: 16px; cursor: pointer; z-index: 10000; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); }
+        .container { width: 800px; height: 480px; display: flex; flex-direction: column; padding: 50px 15px 15px; }
+        .header { text-align: center; margin-bottom: 10px; }
+        .header h1 { font-size: 24px; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .mode-tabs { display: flex; gap: 8px; margin-bottom: 10px; justify-content: center; }
+        .tab-btn { padding: 8px 16px; border: 2px solid #fff; border-radius: 15px; background: rgba(255,255,255,0.2); color: #fff; font-size: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .tab-btn.active { background: linear-gradient(135deg, #ff6b35, #e74c3c); }
+        .content { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        .section { display: none; flex: 1; flex-direction: column; gap: 10px; }
+        .section.active { display: flex; }
+        .result-display { background: rgba(0,0,0,0.4); border: 3px solid #c4d600; border-radius: 15px; padding: 20px; text-align: center; min-height: 100px; display: flex; align-items: center; justify-content: center; }
+        .result-value { font-size: 48px; font-weight: bold; color: #c4d600; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .result-value.large { font-size: 36px; }
+        .result-value.small { font-size: 24px; }
+        .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .btn { padding: 12px 20px; border: 2px solid #fff; border-radius: 10px; background: linear-gradient(135deg, #90c040, #6b9c2e); color: #fff; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s; min-width: 80px; }
+        .btn:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .btn.primary { background: linear-gradient(135deg, #ff6b35, #e74c3c); font-size: 18px; padding: 15px 30px; }
+        .btn.dice { background: linear-gradient(135deg, #8b4513, #a0522d); }
+        .input-group { display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap; }
+        .input-group label { font-size: 14px; font-weight: bold; }
+        .input-group input { width: 80px; padding: 8px; border: 2px solid #c4d600; border-radius: 8px; background: rgba(255,255,255,0.9); color: #1a3d1a; font-size: 16px; text-align: center; }
+        .input-group input[type="text"] { width: 200px; }
+        .name-list { width: 100%; height: 80px; padding: 10px; border: 2px solid #c4d600; border-radius: 10px; background: rgba(255,255,255,0.9); color: #1a3d1a; font-size: 14px; resize: none; }
+        .password-options { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .checkbox-group { display: flex; align-items: center; gap: 5px; }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        .checkbox-group label { font-size: 13px; cursor: pointer; }
+        .coin { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #ffd700, #ffed4e); border: 4px solid #b8860b; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; color: #b8860b; margin: 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .dice-display { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .die { width: 60px; height: 60px; background: #fff; border: 3px solid #333; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #333; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    </style>
+</head>
+<body>
+    <a href="https://10923anonymous.github.io/Avocado-OpenClaw/avocado-website/touchscreen.html" class="back-button" id="backBtn">← Back</a>
+    <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Toggle Fullscreen">⛶</button>
+
+    <div class="container">
+        <div class="header">
+            <h1>🎲 Number Generator</h1>
+        </div>
+
+        <div class="mode-tabs">
+            <button class="tab-btn active" onclick="showTab('dice')">🎲 Dice</button>
+            <button class="tab-btn" onclick="showTab('number')">🔢 Number</button>
+            <button class="tab-btn" onclick="showTab('coin')">🪙 Coin</button>
+            <button class="tab-btn" onclick="showTab('name')">📋 Name</button>
+            <button class="tab-btn" onclick="showTab('password')">🔐 Password</button>
+        </div>
+
+        <div class="content">
+            <!-- Dice Roller -->
+            <div id="dice" class="section active">
+                <div class="result-display">
+                    <div class="dice-display" id="diceResult">
+                        <div class="die">?</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn dice" onclick="rollDice(4)">D4</button>
+                    <button class="btn dice" onclick="rollDice(6)">D6</button>
+                    <button class="btn dice" onclick="rollDice(8)">D8</button>
+                    <button class="btn dice" onclick="rollDice(10)">D10</button>
+                    <button class="btn dice" onclick="rollDice(12)">D12</button>
+                    <button class="btn dice" onclick="rollDice(20)">D20</button>
+                    <button class="btn dice" onclick="rollDice(100)">D100</button>
+                </div>
+                <div class="input-group">
+                    <label>Custom D</label>
+                    <input type="number" id="customDice" value="6" min="2" max="1000">
+                    <button class="btn" onclick="rollCustomDice()">Roll</button>
+                </div>
+            </div>
+
+            <!-- Random Number -->
+            <div id="number" class="section">
+                <div class="result-display">
+                    <div class="result-value" id="numberResult">0</div>
+                </div>
+                <div class="input-group">
+                    <label>Min:</label>
+                    <input type="number" id="minNum" value="1">
+                    <label>Max:</label>
+                    <input type="number" id="maxNum" value="100">
+                </div>
+                <div class="controls">
+                    <button class="btn primary" onclick="generateNumber()">Generate Number</button>
+                </div>
+            </div>
+
+            <!-- Coin Flip -->
+            <div id="coin" class="section">
+                <div class="result-display">
+                    <div class="coin" id="coinDisplay">?</div>
+                </div>
+                <div class="controls">
+                    <button class="btn primary" onclick="flipCoin()">Flip Coin</button>
+                </div>
+            </div>
+
+            <!-- Name Picker -->
+            <div id="name" class="section">
+                <div class="result-display">
+                    <div class="result-value large" id="nameResult">Enter names below</div>
+                </div>
+                <textarea class="name-list" id="nameList" placeholder="Enter names separated by commas or new lines..."></textarea>
+                <div class="controls">
+                    <button class="btn primary" onclick="pickName()">Pick Random Name</button>
+                </div>
+            </div>
+
+            <!-- Password Generator -->
+            <div id="password" class="section">
+                <div class="result-display">
+                    <div class="result-value small" id="passwordResult">Click Generate</div>
+                </div>
+                <div class="input-group">
+                    <label>Length:</label>
+                    <input type="number" id="passLength" value="16" min="4" max="64">
+                </div>
+                <div class="password-options">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="useUpper" checked>
+                        <label for="useUpper">ABC</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="useLower" checked>
+                        <label for="useLower">abc</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="useNumbers" checked>
+                        <label for="useNumbers">123</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="useSymbols">
+                        <label for="useSymbols">!@#</label>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn primary" onclick="generatePassword()">Generate Password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tab).classList.add('active');
+        }
+
+        function rollDice(sides) {
+            const result = Math.floor(Math.random() * sides) + 1;
+            document.getElementById('diceResult').innerHTML = `<div class="die">${result}</div>`;
+        }
+
+        function rollCustomDice() {
+            const sides = parseInt(document.getElementById('customDice').value) || 6;
+            rollDice(sides);
+        }
+
+        function generateNumber() {
+            const min = parseInt(document.getElementById('minNum').value) || 1;
+            const max = parseInt(document.getElementById('maxNum').value) || 100;
+            const result = Math.floor(Math.random() * (max - min + 1)) + min;
+            document.getElementById('numberResult').textContent = result;
+        }
+
+        function flipCoin() {
+            const isHeads = Math.random() < 0.5;
+            const coin = document.getElementById('coinDisplay');
+            coin.textContent = isHeads ? 'H' : 'T';
+            coin.style.background = isHeads 
+                ? 'linear-gradient(135deg, #ffd700, #ffed4e)' 
+                : 'linear-gradient(135deg, #c0c0c0, #e0e0e0)';
+        }
+
+        function pickName() {
+            const input = document.getElementById('nameList').value;
+            const names = input.split(/[\n,]/).map(n => n.trim()).filter(n => n);
+            if (names.length === 0) {
+                document.getElementById('nameResult').textContent = 'Enter names first!';
+                return;
+            }
+            const result = names[Math.floor(Math.random() * names.length)];
+            document.getElementById('nameResult').textContent = result;
+        }
+
+        function generatePassword() {
+            const length = parseInt(document.getElementById('passLength').value) || 16;
+            const useUpper = document.getElementById('useUpper').checked;
+            const useLower = document.getElementById('useLower').checked;
+            const useNumbers = document.getElementById('useNumbers').checked;
+            const useSymbols = document.getElementById('useSymbols').checked;
+
+            let chars = '';
+            if (useUpper) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (useLower) chars += 'abcdefghijklmnopqrstuvwxyz';
+            if (useNumbers) chars += '0123456789';
+            if (useSymbols) chars += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+            if (chars === '') {
+                document.getElementById('passwordResult').textContent = 'Select at least one option!';
+                return;
+            }
+
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('passwordResult').textContent = password;
+        }
+
+        // Fullscreen functions
+        function updateFullscreenButton() {
+            const btn = document.getElementById('fullscreenBtn');
+            if (document.fullscreenElement) {
+                btn.innerHTML = '&#x1F5D9;';
+                btn.title = 'Exit Fullscreen';
+            } else {
+                btn.innerHTML = '&#x26F6;';
+                btn.title = 'Enter Fullscreen';
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        document.addEventListener('fullscreenchange', updateFullscreenButton);
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) updateFullscreenButton();
+        });
+        window.addEventListener('focus', updateFullscreenButton);
+
+        // Auto-enter fullscreen if user was in fullscreen on previous page
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('wasFullscreen') === 'true') {
+                localStorage.removeItem('wasFullscreen');
+                setTimeout(() => toggleFullscreen(), 100);
+            }
+        });
+
+        // Save fullscreen state before leaving
+        document.getElementById('backBtn').addEventListener('click', () => {
+            if (document.fullscreenElement) {
+                localStorage.setItem('wasFullscreen', 'true');
+            }
+        });
+    </script>
+</body>
+</html>
