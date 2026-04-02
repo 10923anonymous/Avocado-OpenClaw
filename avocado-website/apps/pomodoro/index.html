@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=800, height=480, initial-scale=1.0, user-scalable=no">
+    <title>🍅 Pomodoro Timer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 800px;
+            height: 480px;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            padding: 10px 18px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border: 3px solid #fff;
+            border-radius: 12px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: bold;
+            z-index: 10000;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .container {
+            width: 800px;
+            height: 480px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #e74c3c;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 5px;
+        }
+
+        .header .subtitle {
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .timer-display {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.2), rgba(192, 57, 43, 0.2));
+            border: 6px solid #e74c3c;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(231, 76, 60, 0.3), inset 0 0 30px rgba(0,0,0,0.3);
+        }
+
+        .timer-display.break {
+            border-color: #27ae60;
+            background: linear-gradient(135deg, rgba(39, 174, 96, 0.2), rgba(34, 153, 84, 0.2));
+            box-shadow: 0 0 50px rgba(39, 174, 96, 0.3), inset 0 0 30px rgba(0,0,0,0.3);
+        }
+
+        .timer-text {
+            font-size: 56px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-label {
+            font-size: 14px;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .settings {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 15px;
+        }
+
+        .setting {
+            text-align: center;
+        }
+
+        .setting label {
+            display: block;
+            font-size: 11px;
+            color: #aaa;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .setting input {
+            width: 60px;
+            padding: 6px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .setting input:focus {
+            outline: none;
+            border-color: #e74c3c;
+        }
+
+        .stats {
+            display: flex;
+            gap: 25px;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .volume-control {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 12px;
+            border-radius: 20px;
+        }
+
+        .volume-control label {
+            font-size: 11px;
+            color: #aaa;
+        }
+
+        .volume-control input {
+            width: 80px;
+        }
+    </style>
+</head>
+<body>
+    <a href="https://10923anonymous.github.io/Avocado-OpenClaw/avocado-website/touchscreen.html" class="back-button">← Back</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🍅 Pomodoro Timer</h1>
+            <div class="subtitle">Stay focused, take breaks</div>
+        </div>
+
+        <div class="timer-display" id="timerDisplay">
+            <div class="timer-text" id="timerText">25:00</div>
+            <div class="timer-label" id="timerLabel">Focus Time</div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="startBtn">Start</button>
+            <button class="btn btn-secondary" id="pauseBtn" style="display:none;">Pause</button>
+            <button class="btn btn-secondary" id="resetBtn">Reset</button>
+        </div>
+
+        <div class="settings">
+            <div class="setting">
+                <label>Focus (min)</label>
+                <input type="number" id="focusTime" value="25" min="1" max="60">
+            </div>
+            <div class="setting">
+                <label>Break (min)</label>
+                <input type="number" id="breakTime" value="5" min="1" max="30">
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="completedPomodoros">0</div>
+                <div>Completed</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="totalFocusTime">0</div>
+                <div>Focus (min)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="volume-control">
+        <label>🔊</label>
+        <input type="range" id="volumeSlider" min="0" max="100" value="20">
+    </div>
+
+    <script>
+        // Audio elements - using low volume (0.2 = 20%)
+        const focusMusic = new Audio('https://10923anonymous.github.io/Avocado-OpenClaw/assets/audio/focus-music.mp3');
+        const breakMusic = new Audio('https://10923anonymous.github.io/Avocado-OpenClaw/assets/audio/avocado-music.mp3');
+        
+        // Set initial low volume
+        focusMusic.volume = 0.2;
+        breakMusic.volume = 0.2;
+        focusMusic.loop = true;
+        breakMusic.loop = true;
+
+        // Timer state
+        let timeLeft = 25 * 60; // seconds
+        let isRunning = false;
+        let isFocusMode = true;
+        let timerInterval = null;
+        let completedPomodoros = 0;
+        let totalFocusMinutes = 0;
+
+        // DOM elements
+        const timerDisplay = document.getElementById('timerDisplay');
+        const timerText = document.getElementById('timerText');
+        const timerLabel = document.getElementById('timerLabel');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const focusTimeInput = document.getElementById('focusTime');
+        const breakTimeInput = document.getElementById('breakTime');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const completedPomodorosEl = document.getElementById('completedPomodoros');
+        const totalFocusTimeEl = document.getElementById('totalFocusTime');
+
+        // Format time as MM:SS
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Update display
+        function updateDisplay() {
+            timerText.textContent = formatTime(timeLeft);
+        }
+
+        // Switch between focus and break modes
+        function switchMode() {
+            if (isFocusMode) {
+                // Switch to break
+                isFocusMode = false;
+                timeLeft = parseInt(breakTimeInput.value) * 60;
+                timerLabel.textContent = 'Break Time';
+                timerDisplay.classList.add('break');
+                // Stop focus music, play break music
+                focusMusic.pause();
+                focusMusic.currentTime = 0;
+                breakMusic.play();
+            } else {
+                // Switch to focus
+                isFocusMode = true;
+                timeLeft = parseInt(focusTimeInput.value) * 60;
+                timerLabel.textContent = 'Focus Time';
+                timerDisplay.classList.remove('break');
+                // Stop break music, play focus music
+                breakMusic.pause();
+                breakMusic.currentTime = 0;
+                focusMusic.play();
+            }
+            updateDisplay();
+        }
+
+        // Timer tick
+        function tick() {
+            if (timeLeft > 0) {
+                timeLeft--;
+                updateDisplay();
+            } else {
+                // Timer finished
+                if (isFocusMode) {
+                    completedPomodoros++;
+                    totalFocusMinutes += parseInt(focusTimeInput.value);
+                    completedPomodorosEl.textContent = completedPomodoros;
+                    totalFocusTimeEl.textContent = totalFocusMinutes;
+                }
+                switchMode();
+            }
+        }
+
+        // Start timer
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                startBtn.style.display = 'none';
+                pauseBtn.style.display = 'inline-block';
+                // Play appropriate music
+                if (isFocusMode) {
+                    focusMusic.play();
+                } else {
+                    breakMusic.play();
+                }
+                timerInterval = setInterval(tick, 1000);
+            }
+        }
+
+        // Pause timer
+        function pauseTimer() {
+            if (isRunning) {
+                isRunning = false;
+                startBtn.style.display = 'inline-block';
+                pauseBtn.style.display = 'none';
+                clearInterval(timerInterval);
+                // Pause music
+                focusMusic.pause();
+                breakMusic.pause();
+            }
+        }
+
+        // Reset timer
+        function resetTimer() {
+            pauseTimer();
+            isFocusMode = true;
+            timeLeft = parseInt(focusTimeInput.value) * 60;
+            timerLabel.textContent = 'Focus Time';
+            timerDisplay.classList.remove('break');
+            focusMusic.pause();
+            focusMusic.currentTime = 0;
+            breakMusic.pause();
+            breakMusic.currentTime = 0;
+            updateDisplay();
+        }
+
+        // Volume control
+        volumeSlider.addEventListener('input', function() {
+            const volume = this.value / 100;
+            focusMusic.volume = volume;
+            breakMusic.volume = volume;
+        });
+
+        // Settings change handlers
+        focusTimeInput.addEventListener('change', function() {
+            if (!isRunning && isFocusMode) {
+                timeLeft = parseInt(this.value) * 60;
+                updateDisplay();
+            }
+        });
+
+        breakTimeInput.addEventListener('change', function() {
+            if (!isRunning && !isFocusMode) {
+                timeLeft = parseInt(this.value) * 60;
+                updateDisplay();
+            }
+        });
+
+        // Button event listeners
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
+
+        // Initialize display
+        updateDisplay();
+    </script>
+</body>
+</html>
