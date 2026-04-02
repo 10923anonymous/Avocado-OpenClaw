@@ -199,6 +199,45 @@
             font-variant-numeric: tabular-nums;
         }
 
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .keypad-btn {
+            padding: 10px;
+            border: 2px solid #90c040;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(144, 192, 64, 0.3), rgba(107, 156, 46, 0.3));
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .keypad-btn:hover {
+            background: linear-gradient(135deg, #90c040, #6b9c2e);
+            transform: scale(1.05);
+        }
+
+        .keypad-btn:active {
+            transform: scale(0.95);
+        }
+
+        .keypad-btn.clear {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.5), rgba(192, 57, 43, 0.5));
+            border-color: #e74c3c;
+        }
+
+        .keypad-btn.clear:hover {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
         .converter-title {
             font-size: 14px;
             font-weight: bold;
@@ -367,6 +406,20 @@
                         </select>
                     </div>
                 </div>
+                <div class="keypad" id="keypad">
+                    <button class="keypad-btn" onclick="keypadInput('7')">7</button>
+                    <button class="keypad-btn" onclick="keypadInput('8')">8</button>
+                    <button class="keypad-btn" onclick="keypadInput('9')">9</button>
+                    <button class="keypad-btn" onclick="keypadInput('4')">4</button>
+                    <button class="keypad-btn" onclick="keypadInput('5')">5</button>
+                    <button class="keypad-btn" onclick="keypadInput('6')">6</button>
+                    <button class="keypad-btn" onclick="keypadInput('1')">1</button>
+                    <button class="keypad-btn" onclick="keypadInput('2')">2</button>
+                    <button class="keypad-btn" onclick="keypadInput('3')">3</button>
+                    <button class="keypad-btn" onclick="keypadInput('.')">.</button>
+                    <button class="keypad-btn" onclick="keypadInput('0')">0</button>
+                    <button class="keypad-btn clear" onclick="keypadClear()">C</button>
+                </div>
             </div>
         </div>
     </div>
@@ -374,6 +427,7 @@
     <script>
         let currentInput = '0', previousInput = '', operator = '', shouldResetScreen = false;
         let currentConvType = 'length';
+        let convInputValue = '';
 
         const units = {
             length: { m: 1, km: 1000, cm: 0.01, mm: 0.001, ft: 0.3048, in: 0.0254, yd: 0.9144, mi: 1609.34 },
@@ -514,6 +568,20 @@
             numberViewer.textContent = fromValue.toLocaleString();
             
             const fromUnit = document.getElementById('fromUnit').value;
+        }
+
+        function keypadInput(key) {
+            if (key === '.' && convInputValue.includes('.')) return;
+            convInputValue += key;
+            document.getElementById('fromValue').value = convInputValue;
+            convert();
+        }
+
+        function keypadClear() {
+            convInputValue = '';
+            document.getElementById('fromValue').value = '';
+            document.getElementById('toValue').value = '';
+            document.getElementById('numberViewer').textContent = '0';
             const toUnit = document.getElementById('toUnit').value;
             let result;
             
