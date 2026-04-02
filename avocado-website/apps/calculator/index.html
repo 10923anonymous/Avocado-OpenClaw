@@ -853,20 +853,6 @@
             numberViewer.textContent = fromValue.toLocaleString();
             
             const fromUnit = document.getElementById('fromUnit').value;
-        }
-
-        function keypadInput(key) {
-            if (key === '.' && convInputValue.includes('.')) return;
-            convInputValue += key;
-            document.getElementById('fromValue').value = convInputValue;
-            convert();
-        }
-
-        function keypadClear() {
-            convInputValue = '';
-            document.getElementById('numberViewer').textContent = '0';
-            document.getElementById('resultValue').textContent = '0';
-            document.getElementById('numberViewer').textContent = '0';
             const toUnit = document.getElementById('toUnit').value;
             let result;
             
@@ -887,7 +873,19 @@
                 result = (fromValue * unitData[fromUnit]) / unitData[toUnit];
             }
             
-            document.getElementById('resultValue').textContent = parseFloat(result.toFixed(6)).toLocaleString();
+            resultValue.textContent = parseFloat(result.toFixed(6)).toLocaleString();
+        }
+
+        function keypadInput(key) {
+            if (key === '.' && convInputValue.includes('.')) return;
+            convInputValue += key;
+            convert();
+        }
+
+        function keypadClear() {
+            convInputValue = '';
+            document.getElementById('numberViewer').textContent = '0';
+            document.getElementById('resultValue').textContent = '0';
         }
 
         // Fullscreen functions
