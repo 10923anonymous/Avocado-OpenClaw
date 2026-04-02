@@ -182,13 +182,17 @@
         }
 
         .converter-section {
-            width: 280px;
+            width: 680px;
             background: rgba(0,0,0,0.3);
             border-radius: 12px;
             padding: 10px;
             border: 2px solid rgba(255,255,255,0.3);
-            display: flex;
+            display: none;
             flex-direction: column;
+        }
+
+        .converter-section.active {
+            display: flex;
         }
 
         .number-viewer {
@@ -704,9 +708,11 @@
             document.getElementById(tab + 'Tab').classList.add('active');
             if (tab === 'converter') {
                 document.getElementById('calcSection').style.display = 'none';
+                document.getElementById('converterSection').style.display = 'flex';
                 document.getElementById('converterSection').classList.add('active');
             } else {
                 document.getElementById('calcSection').style.display = 'flex';
+                document.getElementById('converterSection').style.display = 'none';
                 document.getElementById('converterSection').classList.remove('active');
                 document.querySelectorAll('.scientific-extra').forEach(b => b.style.display = tab === 'scientific' ? 'flex' : 'none');
             }
