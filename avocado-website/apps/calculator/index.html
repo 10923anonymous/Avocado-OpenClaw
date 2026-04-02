@@ -243,6 +243,66 @@
             background: linear-gradient(135deg, #ff6b35, #e74c3c);
         }
 
+        .converter-displays {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .input-display {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(45, 80, 22, 0.8), rgba(61, 107, 31, 0.8));
+            border: 2px solid #90c040;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .input-label {
+            font-size: 10px;
+            color: #90c040;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .input-label span {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .input-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .result-display {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.3), rgba(231, 76, 60, 0.3));
+            border: 2px solid #ff6b35;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 10px;
+            color: #ff6b35;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .result-label span {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .result-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #fff;
+        }
+
         .keypad-btn {
             padding: 10px;
             border: 2px solid #90c040;
@@ -462,13 +522,19 @@
             </div>
 
             <div class="converter-section" id="converterSection">
-                <!-- Number Viewer (Entering) -->
-                <div class="number-viewer">
-                    <div class="number-viewer-label">Entering</div>
-                    <div class="number-viewer-value" id="numberViewer">0</div>
+                <!-- Top row: Input and Result side by side -->
+                <div class="converter-displays">
+                    <div class="input-display">
+                        <div class="input-label">Entering <span id="fromUnitLabel">meters</span></div>
+                        <div class="input-value" id="numberViewer">0</div>
+                    </div>
+                    <div class="result-display">
+                        <div class="result-label">Result <span id="toUnitLabel">feet</span></div>
+                        <div class="result-value" id="resultValue">0</div>
+                    </div>
                 </div>
 
-                <!-- Keypad and Converter Types side by side -->
+                <!-- Middle: Keypad and Converter Types -->
                 <div class="converter-main">
                     <div class="keypad-container">
                         <div class="keypad" id="keypad">
@@ -494,17 +560,11 @@
                     </div>
                 </div>
 
-                <!-- Result Display -->
-                <div class="result-display">
-                    <div class="result-label">Result</div>
-                    <div class="result-value" id="resultValue">0</div>
-                </div>
-
-                <!-- Unit Selectors at bottom -->
+                <!-- Bottom: Unit Selectors -->
                 <div class="unit-selectors">
                     <div class="unit-group">
                         <label>From</label>
-                        <select id="fromUnit" onchange="convert()">
+                        <select id="fromUnit" onchange="updateUnitLabels(); convert()">
                             <option value="m">Meters</option>
                             <option value="km">Kilometers</option>
                             <option value="cm">Centimeters</option>
@@ -518,7 +578,7 @@
                     <div class="unit-arrow">➜</div>
                     <div class="unit-group">
                         <label>To</label>
-                        <select id="toUnit" onchange="convert()">
+                        <select id="toUnit" onchange="updateUnitLabels(); convert()">
                             <option value="ft">Feet</option>
                             <option value="m">Meters</option>
                             <option value="km">Kilometers</option>
@@ -675,6 +735,16 @@
             else if (type === 'volume') { toSelect.value = 'gal'; }
             
             keypadClear();
+            updateUnitLabels();
+        }
+
+        function updateUnitLabels() {
+            const fromSelect = document.getElementById('fromUnit');
+            const toSelect = document.getElementById('toUnit');
+            const fromLabel = fromSelect.options[fromSelect.selectedIndex].text.toLowerCase();
+            const toLabel = toSelect.options[toSelect.selectedIndex].text.toLowerCase();
+            document.getElementById('fromUnitLabel').textContent = fromLabel;
+            document.getElementById('toUnitLabel').textContent = toLabel;
         }
 
         function convert() {
