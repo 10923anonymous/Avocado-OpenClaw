@@ -238,6 +238,68 @@
             background: linear-gradient(135deg, #e74c3c, #c0392b);
         }
 
+        .result-display {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.3), rgba(231, 76, 60, 0.3));
+            border: 2px solid #ff6b35;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 10px;
+            color: #ff6b35;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .result-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .unit-selectors {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .unit-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .unit-group label {
+            font-size: 10px;
+            color: #aaa;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .unit-group select {
+            padding: 8px 12px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-size: 14px;
+            min-width: 100px;
+        }
+
+        .unit-arrow {
+            font-size: 24px;
+            color: #90c040;
+            margin-top: 15px;
+        }
+
         .converter-title {
             font-size: 14px;
             font-weight: bold;
@@ -320,12 +382,13 @@
         </div>
 
         <div class="mode-tabs">
-            <button class="tab-btn active" id="standardTab">Standard</button>
-            <button class="tab-btn" id="scientificTab">Scientific</button>
+            <button class="tab-btn active" id="standardTab" onclick="showTab('standard')">Standard</button>
+            <button class="tab-btn" id="scientificTab" onclick="showTab('scientific')">Scientific</button>
+            <button class="tab-btn" id="converterTab" onclick="showTab('converter')">Converter</button>
         </div>
 
         <div class="content">
-            <div class="calculator-section">
+            <div class="calculator-section" id="calcSection">
                 <div class="display">
                     <div class="display-history" id="history"></div>
                     <div class="display-main" id="display">0</div>
@@ -363,49 +426,14 @@
                 </div>
             </div>
 
-            <div class="converter-section">
-                <div class="converter-title">🔄 Unit Converter</div>
+            <div class="converter-section" id="converterSection">
+                <!-- Number Viewer (Entering) -->
                 <div class="number-viewer">
                     <div class="number-viewer-label">Entering</div>
                     <div class="number-viewer-value" id="numberViewer">0</div>
                 </div>
-                <div class="converter-type">
-                    <button class="conv-type-btn active" onclick="setConvType('length')">Length</button>
-                    <button class="conv-type-btn" onclick="setConvType('weight')">Weight</button>
-                    <button class="conv-type-btn" onclick="setConvType('temp')">Temp</button>
-                    <button class="conv-type-btn" onclick="setConvType('volume')">Vol</button>
-                </div>
-                <div class="converter-inputs">
-                    <div class="conv-group">
-                        <label>From</label>
-                        <input type="number" id="fromValue" placeholder="Value" oninput="convert()">
-                        <select id="fromUnit" onchange="convert()">
-                            <option value="m">Meters</option>
-                            <option value="km">Kilometers</option>
-                            <option value="cm">Centimeters</option>
-                            <option value="mm">Millimeters</option>
-                            <option value="ft">Feet</option>
-                            <option value="in">Inches</option>
-                            <option value="yd">Yards</option>
-                            <option value="mi">Miles</option>
-                        </select>
-                    </div>
-                    <div class="conv-arrow">⬇</div>
-                    <div class="conv-group">
-                        <label>To</label>
-                        <input type="number" id="toValue" placeholder="Result" readonly>
-                        <select id="toUnit" onchange="convert()">
-                            <option value="ft">Feet</option>
-                            <option value="m">Meters</option>
-                            <option value="km">Kilometers</option>
-                            <option value="cm">Centimeters</option>
-                            <option value="mm">Millimeters</option>
-                            <option value="in">Inches</option>
-                            <option value="yd">Yards</option>
-                            <option value="mi">Miles</option>
-                        </select>
-                    </div>
-                </div>
+
+                <!-- Keypad on top -->
                 <div class="keypad" id="keypad">
                     <button class="keypad-btn" onclick="keypadInput('7')">7</button>
                     <button class="keypad-btn" onclick="keypadInput('8')">8</button>
@@ -419,6 +447,51 @@
                     <button class="keypad-btn" onclick="keypadInput('.')">.</button>
                     <button class="keypad-btn" onclick="keypadInput('0')">0</button>
                     <button class="keypad-btn clear" onclick="keypadClear()">C</button>
+                </div>
+
+                <!-- Result Display -->
+                <div class="result-display">
+                    <div class="result-label">Result</div>
+                    <div class="result-value" id="resultValue">0</div>
+                </div>
+
+                <!-- Converter Type -->
+                <div class="converter-type">
+                    <button class="conv-type-btn active" onclick="setConvType('length')">Length</button>
+                    <button class="conv-type-btn" onclick="setConvType('weight')">Weight</button>
+                    <button class="conv-type-btn" onclick="setConvType('temp')">Temp</button>
+                    <button class="conv-type-btn" onclick="setConvType('volume')">Volume</button>
+                </div>
+
+                <!-- Unit Selectors at bottom -->
+                <div class="unit-selectors">
+                    <div class="unit-group">
+                        <label>From</label>
+                        <select id="fromUnit" onchange="convert()">
+                            <option value="m">Meters</option>
+                            <option value="km">Kilometers</option>
+                            <option value="cm">Centimeters</option>
+                            <option value="mm">Millimeters</option>
+                            <option value="ft">Feet</option>
+                            <option value="in">Inches</option>
+                            <option value="yd">Yards</option>
+                            <option value="mi">Miles</option>
+                        </select>
+                    </div>
+                    <div class="unit-arrow">➜</div>
+                    <div class="unit-group">
+                        <label>To</label>
+                        <select id="toUnit" onchange="convert()">
+                            <option value="ft">Feet</option>
+                            <option value="m">Meters</option>
+                            <option value="km">Kilometers</option>
+                            <option value="cm">Centimeters</option>
+                            <option value="mm">Millimeters</option>
+                            <option value="in">Inches</option>
+                            <option value="yd">Yards</option>
+                            <option value="mi">Miles</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -434,6 +507,19 @@
             weight: { kg: 1, g: 0.001, mg: 0.000001, lb: 0.453592, oz: 0.0283495, st: 6.35029 },
             volume: { l: 1, ml: 0.001, gal: 3.78541, qt: 0.946353, pt: 0.473176, cup: 0.236588, floz: 0.0295735 }
         };
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tab + 'Tab').classList.add('active');
+            if (tab === 'converter') {
+                document.getElementById('calcSection').style.display = 'none';
+                document.getElementById('converterSection').classList.add('active');
+            } else {
+                document.getElementById('calcSection').style.display = 'flex';
+                document.getElementById('converterSection').classList.remove('active');
+                document.querySelectorAll('.scientific-extra').forEach(b => b.style.display = tab === 'scientific' ? 'flex' : 'none');
+            }
+        }
 
         function updateDisplay() {
             document.getElementById('display').textContent = currentInput;
@@ -551,16 +637,16 @@
             else if (type === 'temp') { fromSelect.value = 'c'; toSelect.value = 'f'; }
             else if (type === 'volume') { toSelect.value = 'gal'; }
             
-            document.getElementById('fromValue').value = '';
-            document.getElementById('toValue').value = '';
+            keypadClear();
         }
 
         function convert() {
-            const fromValue = parseFloat(document.getElementById('fromValue').value);
+            const fromValue = parseFloat(convInputValue);
             const numberViewer = document.getElementById('numberViewer');
+            const resultValue = document.getElementById('resultValue');
             
-            if (isNaN(fromValue)) { 
-                document.getElementById('toValue').value = ''; 
+            if (!convInputValue || isNaN(fromValue)) { 
+                resultValue.textContent = '0';
                 numberViewer.textContent = '0';
                 return; 
             }
@@ -579,8 +665,8 @@
 
         function keypadClear() {
             convInputValue = '';
-            document.getElementById('fromValue').value = '';
-            document.getElementById('toValue').value = '';
+            document.getElementById('numberViewer').textContent = '0';
+            document.getElementById('resultValue').textContent = '0';
             document.getElementById('numberViewer').textContent = '0';
             const toUnit = document.getElementById('toUnit').value;
             let result;
@@ -602,7 +688,7 @@
                 result = (fromValue * unitData[fromUnit]) / unitData[toUnit];
             }
             
-            document.getElementById('toValue').value = parseFloat(result.toFixed(6));
+            document.getElementById('resultValue').textContent = parseFloat(result.toFixed(6)).toLocaleString();
         }
     </script>
 </body>
