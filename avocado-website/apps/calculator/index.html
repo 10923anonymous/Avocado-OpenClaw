@@ -208,6 +208,41 @@
             border-top: 1px solid rgba(255,255,255,0.2);
         }
 
+        .converter-main {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .keypad-container {
+            flex: 1;
+        }
+
+        .converter-types-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 80px;
+        }
+
+        .conv-type-btn-vertical {
+            padding: 8px 6px;
+            border: 1px solid #fff;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 11px;
+            cursor: pointer;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .conv-type-btn-vertical.active {
+            background: linear-gradient(135deg, #ff6b35, #e74c3c);
+        }
+
         .keypad-btn {
             padding: 10px;
             border: 2px solid #90c040;
@@ -433,34 +468,36 @@
                     <div class="number-viewer-value" id="numberViewer">0</div>
                 </div>
 
-                <!-- Keypad on top -->
-                <div class="keypad" id="keypad">
-                    <button class="keypad-btn" onclick="keypadInput('7')">7</button>
-                    <button class="keypad-btn" onclick="keypadInput('8')">8</button>
-                    <button class="keypad-btn" onclick="keypadInput('9')">9</button>
-                    <button class="keypad-btn" onclick="keypadInput('4')">4</button>
-                    <button class="keypad-btn" onclick="keypadInput('5')">5</button>
-                    <button class="keypad-btn" onclick="keypadInput('6')">6</button>
-                    <button class="keypad-btn" onclick="keypadInput('1')">1</button>
-                    <button class="keypad-btn" onclick="keypadInput('2')">2</button>
-                    <button class="keypad-btn" onclick="keypadInput('3')">3</button>
-                    <button class="keypad-btn" onclick="keypadInput('.')">.</button>
-                    <button class="keypad-btn" onclick="keypadInput('0')">0</button>
-                    <button class="keypad-btn clear" onclick="keypadClear()">C</button>
+                <!-- Keypad and Converter Types side by side -->
+                <div class="converter-main">
+                    <div class="keypad-container">
+                        <div class="keypad" id="keypad">
+                            <button class="keypad-btn" onclick="keypadInput('7')">7</button>
+                            <button class="keypad-btn" onclick="keypadInput('8')">8</button>
+                            <button class="keypad-btn" onclick="keypadInput('9')">9</button>
+                            <button class="keypad-btn" onclick="keypadInput('4')">4</button>
+                            <button class="keypad-btn" onclick="keypadInput('5')">5</button>
+                            <button class="keypad-btn" onclick="keypadInput('6')">6</button>
+                            <button class="keypad-btn" onclick="keypadInput('1')">1</button>
+                            <button class="keypad-btn" onclick="keypadInput('2')">2</button>
+                            <button class="keypad-btn" onclick="keypadInput('3')">3</button>
+                            <button class="keypad-btn" onclick="keypadInput('.')">.</button>
+                            <button class="keypad-btn" onclick="keypadInput('0')">0</button>
+                            <button class="keypad-btn clear" onclick="keypadClear()">C</button>
+                        </div>
+                    </div>
+                    <div class="converter-types-vertical">
+                        <button class="conv-type-btn-vertical active" onclick="setConvType('length')">Length</button>
+                        <button class="conv-type-btn-vertical" onclick="setConvType('weight')">Weight</button>
+                        <button class="conv-type-btn-vertical" onclick="setConvType('temp')">Temp</button>
+                        <button class="conv-type-btn-vertical" onclick="setConvType('volume')">Volume</button>
+                    </div>
                 </div>
 
                 <!-- Result Display -->
                 <div class="result-display">
                     <div class="result-label">Result</div>
                     <div class="result-value" id="resultValue">0</div>
-                </div>
-
-                <!-- Converter Type -->
-                <div class="converter-type">
-                    <button class="conv-type-btn active" onclick="setConvType('length')">Length</button>
-                    <button class="conv-type-btn" onclick="setConvType('weight')">Weight</button>
-                    <button class="conv-type-btn" onclick="setConvType('temp')">Temp</button>
-                    <button class="conv-type-btn" onclick="setConvType('volume')">Volume</button>
                 </div>
 
                 <!-- Unit Selectors at bottom -->
@@ -601,7 +638,7 @@
 
         function setConvType(type) {
             currentConvType = type;
-            document.querySelectorAll('.conv-type-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.conv-type-btn, .conv-type-btn-vertical').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
             const fromSelect = document.getElementById('fromUnit');
