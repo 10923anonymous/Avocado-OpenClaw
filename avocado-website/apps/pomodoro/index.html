@@ -43,6 +43,27 @@
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
         }
 
+        .fullscreen-btn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            padding: 10px 15px;
+            background: linear-gradient(135deg, #2d5016, #3d6b1f);
+            border: 3px solid #fff;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 10000;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .fullscreen-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
         .container {
             width: 800px;
             height: 480px;
@@ -284,6 +305,7 @@
 </head>
 <body>
     <a href="https://10923anonymous.github.io/Avocado-OpenClaw/avocado-website/touchscreen.html" class="back-button">← Back</a>
+    <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Toggle Fullscreen">⛶</button>
     
     <div class="container">
         <div class="header">
@@ -556,6 +578,36 @@
 
         // Initialize display
         updateDisplay();
+
+        // Fullscreen functions
+        function updateFullscreenButton() {
+            const btn = document.getElementById('fullscreenBtn');
+            if (document.fullscreenElement) {
+                btn.innerHTML = '&#x1F5D9;';
+                btn.title = 'Exit Fullscreen';
+            } else {
+                btn.innerHTML = '&#x26F6;';
+                btn.title = 'Enter Fullscreen';
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        document.addEventListener('fullscreenchange', updateFullscreenButton);
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                updateFullscreenButton();
+            }
+        });
+        window.addEventListener('focus', updateFullscreenButton);
     </script>
 </body>
 </html>

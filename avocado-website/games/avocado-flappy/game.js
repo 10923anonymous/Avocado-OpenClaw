@@ -767,3 +767,33 @@ loadCustomization();
 updateCustomizationUI();
 bird.reset();
 gameLoop();
+
+// Fullscreen functions
+function updateFullscreenButton() {
+    const btn = document.getElementById('fullscreenBtn');
+    if (document.fullscreenElement) {
+        btn.innerHTML = '&#x1F5D9;';
+        btn.title = 'Exit Fullscreen';
+    } else {
+        btn.innerHTML = '&#x26F6;';
+        btn.title = 'Enter Fullscreen';
+    }
+}
+
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.log(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+document.addEventListener('fullscreenchange', updateFullscreenButton);
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+        updateFullscreenButton();
+    }
+});
+window.addEventListener('focus', updateFullscreenButton);
