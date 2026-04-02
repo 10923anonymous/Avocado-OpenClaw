@@ -545,6 +545,12 @@
         }
 
         document.addEventListener('fullscreenchange', updateFullscreenButton);
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                updateFullscreenButton();
+            }
+        });
+        window.addEventListener('focus', updateFullscreenButton);
     </script>
 </body>
 </html>
