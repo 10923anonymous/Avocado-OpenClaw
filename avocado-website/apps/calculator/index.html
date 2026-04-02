@@ -220,7 +220,7 @@
 
         .keypad {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 6px;
             margin-top: 6px;
             padding: 8px;
@@ -612,8 +612,8 @@
                     <button class="calc-btn btn-operator" onclick="appendOperator('+')">+</button>
                     
                     <button class="calc-btn btn-function scientific-extra" onclick="insertFunction('sqrt')">√</button>
-                    <button class="calc-btn btn-number" onclick="appendNumber('0')">0</button>
-                    <button class="calc-btn btn-number" onclick="appendNumber('.')">.</button>
+                    <button class="calc-btn btn-function scientific-extra" onclick="appendNumber('(')">(</button>
+                    <button class="calc-btn btn-function scientific-extra" onclick="appendNumber(')')">)</button>
                     <button class="calc-btn btn-function" onclick="deleteLast()">⌫</button>
                     <button class="calc-btn btn-equals" onclick="calculate()">=</button>
                 </div>
@@ -647,6 +647,7 @@
                             <button class="keypad-btn" onclick="keypadInput('3')">3</button>
                             <button class="keypad-btn" onclick="keypadInput('.')">.</button>
                             <button class="keypad-btn" onclick="keypadInput('0')">0</button>
+                            <button class="keypad-btn" onclick="toggleConvSign()">+/-</button>
                             <button class="keypad-btn clear" onclick="keypadClear()">C</button>
                         </div>
                     </div>
@@ -880,6 +881,17 @@
             if (key === '.' && convInputValue.includes('.')) return;
             convInputValue += key;
             convert();
+        }
+
+        function toggleConvSign() {
+            if (convInputValue) {
+                if (convInputValue.startsWith('-')) {
+                    convInputValue = convInputValue.substring(1);
+                } else {
+                    convInputValue = '-' + convInputValue;
+                }
+                convert();
+            }
         }
 
         function keypadClear() {
