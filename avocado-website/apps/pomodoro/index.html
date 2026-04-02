@@ -135,6 +135,29 @@
             box-shadow: 0 0 40px rgba(255, 225, 53, 0.4), inset 0 0 20px rgba(0,0,0,0.2);
         }
 
+        .progress-ring {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 260px;
+            height: 260px;
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            fill: none;
+            stroke: #ffe135;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s linear;
+            filter: drop-shadow(0 0 5px rgba(255, 225, 53, 0.8));
+        }
+
+        .timer-display.break .progress-ring-circle {
+            stroke: #2d5016;
+            filter: drop-shadow(0 0 5px rgba(45, 80, 22, 0.8));
+        }
+
         .timer-display.digital {
             border-radius: 20px;
             width: 280px;
@@ -337,6 +360,9 @@
         </div>
 
         <div class="timer-display" id="timerDisplay">
+            <svg class="progress-ring" id="progressRing">
+                <circle class="progress-ring-circle" id="progressCircle" cx="130" cy="130" r="125"/>
+            </svg>
             <div class="timer-text" id="timerText">25:00</div>
             <div class="timer-label" id="timerLabel">Focus Time</div>
         </div>
@@ -380,12 +406,21 @@
         // Audio elements - using low volume (0.2 = 20%)
         const focusMusic = new Audio('https://10923anonymous.github.io/Avocado-OpenClaw/assets/audio/focus-music.mp3');
         const breakMusic = new Audio('https://10923anonymous.github.io/Avocado-OpenClaw/assets/audio/avocado-music.mp3');
+        const bellSound = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
         
         // Set initial low volume
         focusMusic.volume = 0.2;
         breakMusic.volume = 0.2;
+        bellSound.volume = 0.5;
         focusMusic.loop = true;
         breakMusic.loop = true;
+
+        // Progress ring setup
+        const progressCircle = document.getElementById('progressCircle');
+        const radius = progressCircle.r.baseVal.value;
+        const circumference = radius * 2 * Math.PI;
+        progressCircle.style.strokeDasharray = `${circumference} ${circumference}`;
+        progressCircle.style.strokeDashoffset = 0;
 
         // Timer state
         let timeLeft = 25 * 60; // seconds
@@ -443,6 +478,15 @@
             }
         }
 
+        // Update progress ring
+        function updateProgressRing() {
+            const totalTime = isFocusMode 
+                ? parseInt(focusTimeInput.value) * 60 
+                : parseInt(breakTimeInput.value) * 60;
+            const offset = circumference - (timeLeft / totalTime) * circumference;
+            progressCircle.style.strokeDashoffset = offset;
+        }
+
         // Switch between focus and break modes
         function switchMode() {
             if (isFocusMode) {
@@ -486,8 +530,11 @@
             if (timeLeft > 0) {
                 timeLeft--;
                 updateDisplay();
+                updateProgressRing();
             } else {
-                // Timer finished
+                // Timer finished - play bell sound
+                bellSound.currentTime = 0;
+                bellSound.play();
                 if (isFocusMode) {
                     completedPomodoros++;
                     totalFocusMinutes += parseInt(focusTimeInput.value);
@@ -538,6 +585,8 @@
             focusMusic.currentTime = 0;
             breakMusic.pause();
             breakMusic.currentTime = 0;
+            // Reset progress ring
+            progressCircle.style.strokeDashoffset = 0;
             updateDisplay();
         }
 
@@ -550,6 +599,8 @@
             timeLeft = focus * 60;
             timerLabel.textContent = 'Focus Time';
             timerDisplay.classList.remove('break');
+            // Reset progress ring
+            progressCircle.style.strokeDashoffset = 0;
             updateDisplay();
         }
 
