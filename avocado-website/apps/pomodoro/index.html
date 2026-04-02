@@ -115,8 +115,8 @@
         }
 
         .timer-display {
-            width: 240px;
-            height: 240px;
+            width: 280px;
+            height: 200px;
             border-radius: 50%;
             background: linear-gradient(135deg, rgba(255, 225, 53, 0.3), rgba(144, 192, 64, 0.3));
             border: 5px solid #2d5016;
@@ -139,8 +139,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 220px;
-            height: 220px;
+            width: 270px;
+            height: 190px;
             transform: translate(-50%, -50%) rotate(-90deg);
             pointer-events: none;
         }
@@ -371,8 +371,8 @@
 
         <div class="timer-display" id="timerDisplay">
             <div class="progress-ring" id="progressRing">
-                <svg viewBox="0 0 220 220" preserveAspectRatio="none">
-                    <ellipse class="progress-ring-ellipse" id="progressEllipse" cx="110" cy="110" rx="106" ry="106"/>
+                <svg viewBox="0 0 270 190" preserveAspectRatio="none">
+                    <ellipse class="progress-ring-ellipse" id="progressEllipse" cx="135" cy="95" rx="130" ry="90"/>
                 </svg>
             </div>
             <div class="timer-text" id="timerText">25:00</div>
@@ -429,10 +429,11 @@
 
         // Progress ring setup
         const progressEllipse = document.getElementById('progressEllipse');
-        const rx = 106;
-        const ry = 106;
+        const rx = 130;
+        const ry = 90;
         // Approximate ellipse circumference using Ramanujan approximation
-        const circumference = Math.PI * (3 * (rx + ry) - Math.sqrt((3 * rx + ry) * (rx + 3 * ry)));
+        const h = Math.pow(rx - ry, 2) / Math.pow(rx + ry, 2);
+        const circumference = Math.PI * (rx + ry) * (1 + (3 * h) / (10 + Math.sqrt(4 - 3 * h)));
         progressEllipse.style.strokeDasharray = `${circumference} ${circumference}`;
         progressEllipse.style.strokeDashoffset = 0;
 
