@@ -243,6 +243,52 @@
             background: linear-gradient(135deg, #ff6b35, #e74c3c);
         }
 
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 120px;
+        }
+
+        .unit-selectors-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .unit-group-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .unit-group-vertical label {
+            font-size: 10px;
+            color: #aaa;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .unit-group-vertical select {
+            padding: 6px 8px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-size: 12px;
+            width: 100%;
+        }
+
+        .unit-arrow-small {
+            text-align: center;
+            font-size: 16px;
+            color: #90c040;
+        }
+
         .converter-displays {
             display: flex;
             gap: 10px;
@@ -542,7 +588,7 @@
                     </div>
                 </div>
 
-                <!-- Middle: Keypad and Converter Types -->
+                <!-- Middle: Keypad on left, Converter Types and Unit Selectors on right -->
                 <div class="converter-main">
                     <div class="keypad-container">
                         <div class="keypad" id="keypad">
@@ -560,42 +606,42 @@
                             <button class="keypad-btn clear" onclick="keypadClear()">C</button>
                         </div>
                     </div>
-                    <div class="converter-types-vertical">
-                        <button class="conv-type-btn-vertical active" onclick="setConvType('length')">Length</button>
-                        <button class="conv-type-btn-vertical" onclick="setConvType('weight')">Weight</button>
-                        <button class="conv-type-btn-vertical" onclick="setConvType('temp')">Temp</button>
-                        <button class="conv-type-btn-vertical" onclick="setConvType('volume')">Volume</button>
-                    </div>
-                </div>
-
-                <!-- Bottom: Unit Selectors -->
-                <div class="unit-selectors">
-                    <div class="unit-group">
-                        <label>From</label>
-                        <select id="fromUnit" onchange="updateUnitLabels(); convert()">
-                            <option value="m">Meters</option>
-                            <option value="km">Kilometers</option>
-                            <option value="cm">Centimeters</option>
-                            <option value="mm">Millimeters</option>
-                            <option value="ft">Feet</option>
-                            <option value="in">Inches</option>
-                            <option value="yd">Yards</option>
-                            <option value="mi">Miles</option>
-                        </select>
-                    </div>
-                    <div class="unit-arrow">➜</div>
-                    <div class="unit-group">
-                        <label>To</label>
-                        <select id="toUnit" onchange="updateUnitLabels(); convert()">
-                            <option value="ft">Feet</option>
-                            <option value="m">Meters</option>
-                            <option value="km">Kilometers</option>
-                            <option value="cm">Centimeters</option>
-                            <option value="mm">Millimeters</option>
-                            <option value="in">Inches</option>
-                            <option value="yd">Yards</option>
-                            <option value="mi">Miles</option>
-                        </select>
+                    <div class="right-panel">
+                        <div class="converter-types-vertical">
+                            <button class="conv-type-btn-vertical active" onclick="setConvType('length')">Length</button>
+                            <button class="conv-type-btn-vertical" onclick="setConvType('weight')">Weight</button>
+                            <button class="conv-type-btn-vertical" onclick="setConvType('temp')">Temp</button>
+                            <button class="conv-type-btn-vertical" onclick="setConvType('volume')">Volume</button>
+                        </div>
+                        <div class="unit-selectors-vertical">
+                            <div class="unit-group-vertical">
+                                <label>From</label>
+                                <select id="fromUnit" onchange="updateUnitLabels(); convert()">
+                                    <option value="m">Meters</option>
+                                    <option value="km">Kilometers</option>
+                                    <option value="cm">Centimeters</option>
+                                    <option value="mm">Millimeters</option>
+                                    <option value="ft">Feet</option>
+                                    <option value="in">Inches</option>
+                                    <option value="yd">Yards</option>
+                                    <option value="mi">Miles</option>
+                                </select>
+                            </div>
+                            <div class="unit-arrow-small">➜</div>
+                            <div class="unit-group-vertical">
+                                <label>To</label>
+                                <select id="toUnit" onchange="updateUnitLabels(); convert()">
+                                    <option value="ft">Feet</option>
+                                    <option value="m">Meters</option>
+                                    <option value="km">Kilometers</option>
+                                    <option value="cm">Centimeters</option>
+                                    <option value="mm">Millimeters</option>
+                                    <option value="in">Inches</option>
+                                    <option value="yd">Yards</option>
+                                    <option value="mi">Miles</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
