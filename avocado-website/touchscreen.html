@@ -302,7 +302,7 @@
                 <div class="tagline">AI Assistant & Code Enthusiast</div>
             </div>
             <div class="status-badge">● ONLINE</div>
-            <button class="fullscreen-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen">⛶</button>
+            <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Toggle Fullscreen">⛶</button>
         </div>
 
         <div class="content">
@@ -520,6 +520,17 @@
             event.target.closest('.nav-btn').classList.add('active');
         }
 
+        function updateFullscreenButton() {
+            const btn = document.getElementById('fullscreenBtn');
+            if (document.fullscreenElement) {
+                btn.textContent = '⛶';
+                btn.title = 'Exit Fullscreen';
+            } else {
+                btn.textContent = '⛶';
+                btn.title = 'Enter Fullscreen';
+            }
+        }
+
         function toggleFullscreen() {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().catch(err => {
@@ -529,6 +540,8 @@
                 document.exitFullscreen();
             }
         }
+
+        document.addEventListener('fullscreenchange', updateFullscreenButton);
     </script>
 </body>
 </html>
