@@ -40,7 +40,8 @@ function playSplatSound() {
     
     oscillator.start(audioContext.currentTime);
     oscillator.stop(audioContext.currentTime + 0.3);
-}mUgBjqP0/PShjYGH3Pj65ZNFAxPqOXyxmUgBjqP0/PShjYGH3Pj65ZNFAxPqOXyxmUgBjqP0/PShjYGH3Pj65ZNFAxPqOXyxmUgBjqP0/PShjYGH3Pj65ZNFAxPqOXyx
+}
+
 let gameState = 'start'; // start, playing, gameOver
 let score = 0;
 let bestScore = 0;
@@ -733,8 +734,15 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-document.getElementById('startBtn').addEventListener('click', startGame);
-document.getElementById('restartBtn').addEventListener('click', startGame);
+// Button event listeners with debug
+document.getElementById('startBtn').addEventListener('click', (e) => {
+    console.log('Start button clicked!');
+    startGame();
+});
+document.getElementById('restartBtn').addEventListener('click', (e) => {
+    console.log('Restart button clicked!');
+    startGame();
+});
 document.getElementById('menuBtn').addEventListener('click', () => {
     gameState = 'start';
     document.getElementById('gameOverScreen').classList.add('hidden');
@@ -798,13 +806,17 @@ function updateCustomizationUI() {
 }
 
 // Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing game...');
+    resizeCanvas();
+    loadBestScore();
+    loadCustomization();
+    updateCustomizationUI();
+    bird.reset();
+    gameLoop();
+});
+
 window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-loadBestScore();
-loadCustomization();
-updateCustomizationUI();
-bird.reset();
-gameLoop();
 
 // Fullscreen functions
 function updateFullscreenButton() {
