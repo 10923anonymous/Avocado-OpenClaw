@@ -249,48 +249,68 @@
         .right-panel {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            width: 140px;
+            gap: 8px;
+            width: 160px;
             flex-shrink: 0;
         }
 
-        .unit-selectors-vertical {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 10px;
-            padding: 10px;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .unit-group-vertical {
-            display: flex;
-            flex-direction: column;
+        .converter-types-horizontal {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 4px;
         }
 
-        .unit-group-vertical label {
+        .conv-type-btn-h {
+            padding: 6px 4px;
+            border: 1px solid #fff;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
             font-size: 10px;
-            color: #aaa;
-            text-transform: uppercase;
-            text-align: center;
+            cursor: pointer;
         }
 
-        .unit-group-vertical select {
-            padding: 6px 8px;
+        .conv-type-btn-h.active {
+            background: linear-gradient(135deg, #ff6b35, #e74c3c);
+        }
+
+        .unit-selectors-stacked {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .unit-row {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .unit-row label {
+            font-size: 9px;
+            color: #aaa;
+            text-transform: uppercase;
+        }
+
+        .unit-row select {
+            padding: 4px 6px;
             border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 6px;
+            border-radius: 4px;
             background: rgba(0,0,0,0.3);
             color: #fff;
-            font-size: 12px;
+            font-size: 11px;
             width: 100%;
         }
 
-        .unit-arrow-small {
+        .unit-arrow-row {
             text-align: center;
-            font-size: 16px;
+            font-size: 14px;
             color: #90c040;
+            line-height: 1;
         }
 
         .converter-displays {
@@ -611,14 +631,14 @@
                         </div>
                     </div>
                     <div class="right-panel">
-                        <div class="converter-types-vertical">
-                            <button class="conv-type-btn-vertical active" onclick="setConvType('length')">Length</button>
-                            <button class="conv-type-btn-vertical" onclick="setConvType('weight')">Weight</button>
-                            <button class="conv-type-btn-vertical" onclick="setConvType('temp')">Temp</button>
-                            <button class="conv-type-btn-vertical" onclick="setConvType('volume')">Volume</button>
+                        <div class="converter-types-horizontal">
+                            <button class="conv-type-btn-h active" onclick="setConvType('length')">Length</button>
+                            <button class="conv-type-btn-h" onclick="setConvType('weight')">Weight</button>
+                            <button class="conv-type-btn-h" onclick="setConvType('temp')">Temp</button>
+                            <button class="conv-type-btn-h" onclick="setConvType('volume')">Volume</button>
                         </div>
-                        <div class="unit-selectors-vertical">
-                            <div class="unit-group-vertical">
+                        <div class="unit-selectors-stacked">
+                            <div class="unit-row">
                                 <label>From</label>
                                 <select id="fromUnit" onchange="updateUnitLabels(); convert()">
                                     <option value="m">Meters</option>
@@ -631,8 +651,8 @@
                                     <option value="mi">Miles</option>
                                 </select>
                             </div>
-                            <div class="unit-arrow-small">➜</div>
-                            <div class="unit-group-vertical">
+                            <div class="unit-arrow-row">➜</div>
+                            <div class="unit-row">
                                 <label>To</label>
                                 <select id="toUnit" onchange="updateUnitLabels(); convert()">
                                     <option value="ft">Feet</option>
@@ -756,7 +776,7 @@
 
         function setConvType(type) {
             currentConvType = type;
-            document.querySelectorAll('.conv-type-btn, .conv-type-btn-vertical').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.conv-type-btn, .conv-type-btn-vertical, .conv-type-btn-h').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
             const fromSelect = document.getElementById('fromUnit');
