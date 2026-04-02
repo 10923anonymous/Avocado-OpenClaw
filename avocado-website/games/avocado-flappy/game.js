@@ -4,8 +4,11 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// Sound effects using Web Audio API
+// Sound effects
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+// Pre-load audio files
+const splatSound = new Audio('splat.mp3');
 
 function playJumpSound() {
     const oscillator = audioContext.createOscillator();
@@ -25,21 +28,9 @@ function playJumpSound() {
 }
 
 function playSplatSound() {
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    oscillator.type = 'sawtooth';
-    oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.3);
-    
-    gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-    
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.3);
+    // Play the MP3 sound effect
+    splatSound.currentTime = 0;
+    splatSound.play().catch(e => console.log('Audio play failed:', e));
 }
 
 let gameState = 'start'; // start, playing, gameOver
