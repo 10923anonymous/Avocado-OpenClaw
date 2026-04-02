@@ -265,15 +265,20 @@
             margin-bottom: 2px;
         }
 
-        .input-label span {
-            color: #fff;
-            font-weight: bold;
-        }
-
         .input-value {
             font-size: 28px;
             font-weight: bold;
             color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .unit-label {
+            font-size: 14px;
+            color: #90c040;
+            font-weight: normal;
         }
 
         .result-display {
@@ -292,15 +297,18 @@
             margin-bottom: 2px;
         }
 
-        .result-label span {
-            color: #fff;
-            font-weight: bold;
-        }
-
         .result-value {
             font-size: 28px;
             font-weight: bold;
             color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .result-value .unit-label {
+            color: #ff6b35;
         }
 
         .keypad-btn {
@@ -525,12 +533,12 @@
                 <!-- Top row: Input and Result side by side -->
                 <div class="converter-displays">
                     <div class="input-display">
-                        <div class="input-label">Entering <span id="fromUnitLabel">meters</span></div>
-                        <div class="input-value" id="numberViewer">0</div>
+                        <div class="input-label">Entering</div>
+                        <div class="input-value"><span id="numberViewer">0</span> <span class="unit-label" id="fromUnitLabel">meters</span></div>
                     </div>
                     <div class="result-display">
-                        <div class="result-label">Result <span id="toUnitLabel">feet</span></div>
-                        <div class="result-value" id="resultValue">0</div>
+                        <div class="result-label">Result</div>
+                        <div class="result-value"><span id="resultValue">0</span> <span class="unit-label" id="toUnitLabel">feet</span></div>
                     </div>
                 </div>
 
