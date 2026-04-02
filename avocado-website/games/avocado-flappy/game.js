@@ -4,7 +4,43 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// Game state
+// Sound effects using Web Audio API
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+function playJumpSound() {
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(600, audioContext.currentTime + 0.1);
+    
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.1);
+}
+
+function playSplatSound() {
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.type = 'sawtooth';
+    oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.3);
+    
+    gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.3);
+}mUgBjqP0/PShjYGH3Pj65ZNFAxPqOXyxmUgBjqP0/PShjYGH3Pj65ZNFAxPqOXyxmUgBjqP0/PShjYGH3Pj65ZNFAxPqOXyxmUgBjqP0/PShjYGH3Pj65ZNFAxPqOXyx
 let gameState = 'start'; // start, playing, gameOver
 let score = 0;
 let bestScore = 0;
@@ -104,6 +140,7 @@ const bird = {
     
     jump() {
         this.velocity = this.jumpStrength;
+        playJumpSound();
     },
     
     update() {
@@ -489,6 +526,7 @@ function startGame() {
 
 function gameOver() {
     gameState = 'gameOver';
+    playSplatSound();
     createSplatParticles(bird.x, bird.y);
     
     if (score > bestScore) {
