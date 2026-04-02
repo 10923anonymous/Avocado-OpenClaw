@@ -304,7 +304,7 @@
     </style>
 </head>
 <body>
-    <a href="https://10923anonymous.github.io/Avocado-OpenClaw/avocado-website/touchscreen.html" class="back-button">← Back</a>
+    <a href="https://10923anonymous.github.io/Avocado-OpenClaw/avocado-website/touchscreen.html" class="back-button" id="backBtn">← Back</a>
     <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Toggle Fullscreen">⛶</button>
     
     <div class="container">
@@ -608,6 +608,25 @@
             }
         });
         window.addEventListener('focus', updateFullscreenButton);
+
+        // Auto-enter fullscreen if user was in fullscreen on previous page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if we should be in fullscreen (user clicked link while fullscreen)
+            if (localStorage.getItem('wasFullscreen') === 'true') {
+                localStorage.removeItem('wasFullscreen');
+                // Small delay to allow page to render first
+                setTimeout(() => {
+                    toggleFullscreen();
+                }, 100);
+            }
+        });
+
+        // Save fullscreen state before leaving
+        document.getElementById('backBtn').addEventListener('click', (e) => {
+            if (document.fullscreenElement) {
+                localStorage.setItem('wasFullscreen', 'true');
+            }
+        });
     </script>
 </body>
 </html>

@@ -797,3 +797,20 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 window.addEventListener('focus', updateFullscreenButton);
+
+// Auto-enter fullscreen if user was in fullscreen on previous page
+document.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('wasFullscreen') === 'true') {
+        localStorage.removeItem('wasFullscreen');
+        setTimeout(() => {
+            toggleFullscreen();
+        }, 100);
+    }
+});
+
+// Save fullscreen state before leaving
+document.getElementById('backBtn').addEventListener('click', (e) => {
+    if (document.fullscreenElement) {
+        localStorage.setItem('wasFullscreen', 'true');
+    }
+});

@@ -322,7 +322,7 @@
                 <button class="nav-btn" onclick="showSection('apps')">
                     <span class="icon">🎮</span> Apps
                 </button>
-                <a href="../avocado_website.html" class="nav-btn" target="_blank" rel="noopener">
+                <a href="../avocado_website.html" class="nav-btn">
                     <span class="icon">🖥️</span> Desktop
                 </a>
             </div>
@@ -489,22 +489,22 @@
                 <div id="apps" class="section">
                     <div class="panel-title">🎮 Apps & Games</div>
                     <div class="apps-grid">
-                        <a href="https://10923anonymous.github.io/Avocado-OpenClaw/snake-game-original/" class="app-card" target="_blank" rel="noopener">
+                        <a href="https://10923anonymous.github.io/Avocado-OpenClaw/snake-game-original/" class="app-card">
                             <div class="icon">🐍</div>
                             <h4>Snake Game</h4>
                             <p>AI rivals & moving food</p>
                         </a>
-                        <a href="games/avocado-flappy/" class="app-card" target="_blank" rel="noopener">
+                        <a href="games/avocado-flappy/" class="app-card">
                             <div class="icon">🥑</div>
                             <h4>Avocado Flappy</h4>
                             <p>Fly through giant avocados!</p>
                         </a>
-                        <a href="apps/pomodoro/" class="app-card" target="_blank" rel="noopener">
+                        <a href="apps/pomodoro/" class="app-card">
                             <div class="icon">🍅</div>
                             <h4>Pomodoro</h4>
                             <p>Focus timer with music</p>
                         </a>
-                        <a href="apps/calculator/" class="app-card" target="_blank" rel="noopener">
+                        <a href="apps/calculator/" class="app-card">
                             <div class="icon">🧮</div>
                             <h4>Calculator</h4>
                             <p>Scientific + Unit Converter</p>
@@ -551,6 +551,25 @@
             }
         });
         window.addEventListener('focus', updateFullscreenButton);
+
+        // Save fullscreen state before navigating
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (document.fullscreenElement) {
+                    localStorage.setItem('wasFullscreen', 'true');
+                }
+            });
+        });
+
+        // Auto-enter fullscreen if returning from another page
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('wasFullscreen') === 'true') {
+                localStorage.removeItem('wasFullscreen');
+                setTimeout(() => {
+                    toggleFullscreen();
+                }, 100);
+            }
+        });
     </script>
 </body>
 </html>
