@@ -17,7 +17,7 @@
             height: 480px;
             overflow: hidden;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #2d5016 0%, #e74c3c 50%, #8b4513 100%);
+            background: linear-gradient(135deg, #1a3d1a 0%, #2d5016 20%, #3d6b1f 40%, #90c040 50%, #ff6b35 70%, #e74c3c 85%, #8b4513 100%);
             color: #fff;
         }
 
@@ -176,6 +176,29 @@
             flex-direction: column;
         }
 
+        .number-viewer {
+            background: linear-gradient(135deg, rgba(45, 80, 22, 0.8), rgba(61, 107, 31, 0.8));
+            border: 2px solid #90c040;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .number-viewer-label {
+            font-size: 10px;
+            color: #90c040;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .number-viewer-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
+
         .converter-title {
             font-size: 14px;
             font-weight: bold;
@@ -303,6 +326,10 @@
 
             <div class="converter-section">
                 <div class="converter-title">🔄 Unit Converter</div>
+                <div class="number-viewer">
+                    <div class="number-viewer-label">Entering</div>
+                    <div class="number-viewer-value" id="numberViewer">0</div>
+                </div>
                 <div class="converter-type">
                     <button class="conv-type-btn active" onclick="setConvType('length')">Length</button>
                     <button class="conv-type-btn" onclick="setConvType('weight')">Weight</button>
@@ -476,7 +503,15 @@
 
         function convert() {
             const fromValue = parseFloat(document.getElementById('fromValue').value);
-            if (isNaN(fromValue)) { document.getElementById('toValue').value = ''; return; }
+            const numberViewer = document.getElementById('numberViewer');
+            
+            if (isNaN(fromValue)) { 
+                document.getElementById('toValue').value = ''; 
+                numberViewer.textContent = '0';
+                return; 
+            }
+            
+            numberViewer.textContent = fromValue.toLocaleString();
             
             const fromUnit = document.getElementById('fromUnit').value;
             const toUnit = document.getElementById('toUnit').value;
