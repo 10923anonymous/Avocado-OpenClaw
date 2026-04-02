@@ -526,10 +526,10 @@
         function updateFullscreenButton() {
             const btn = document.getElementById('fullscreenBtn');
             if (document.fullscreenElement) {
-                btn.textContent = '⛶';
+                btn.innerHTML = '&#x1F5D9;';
                 btn.title = 'Exit Fullscreen';
             } else {
-                btn.textContent = '⛶';
+                btn.innerHTML = '&#x26F6;';
                 btn.title = 'Enter Fullscreen';
             }
         }
