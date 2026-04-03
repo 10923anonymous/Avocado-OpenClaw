@@ -37,4 +37,10 @@ Skills are shared. Your setup is yours. Keeping them apart means you can update 
 
 ---
 
+### SSH
+
+- GitHub: `~/.ssh/id_ed25519` configured for 10923anonymous/Avocado-OpenClaw
+
+---
+
 Add whatever helps you do your job. This is your cheat sheet.

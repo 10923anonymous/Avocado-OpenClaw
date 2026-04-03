@@ -257,6 +257,19 @@
             padding: 12px 0;
         }
 
+        .circle-layout .stats {
+            flex-direction: column;
+            gap: 15px;
+            margin-left: 10px;
+        }
+
+        .circle-layout .stat {
+            background: rgba(255,255,255,0.4);
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: 2px solid #2d5016;
+        }
+
         .btn {
             padding: 10px 20px;
             border: none;
@@ -393,7 +406,18 @@
             <button class="preset-btn" onclick="setPreset(90, 20)">🚀 90/20</button>
         </div>
 
-        <div class="circle-layout" id="circleLayout">
+        <div class="settings">
+            <div class="setting">
+                <label>Focus (min)</label>
+                <input type="text" id="focusTime" value="25" min="1" max="180" readonly onclick="openKeypad('focusTime', 1, 180)">
+            </div>
+            <div class="setting">
+                <label>Break (min)</label>
+                <input type="text" id="breakTime" value="5" min="1" max="60" readonly onclick="openKeypad('breakTime', 1, 60)">
+            </div>
+        </div>
+
+        <div class="circle-layout" id="mainCircleLayout">
             <div class="timer-display" id="timerDisplay">
                 <div class="progress-ring" id="progressRing">
                     <svg viewBox="0 0 260 260" preserveAspectRatio="none">
@@ -410,27 +434,16 @@
                 <button class="btn btn-secondary" id="resetBtn">Reset</button>
                 <button class="btn btn-skip" id="skipBtn">Skip ⏭</button>
             </div>
-        </div>
 
-        <div class="settings">
-            <div class="setting">
-                <label>Focus (min)</label>
-                <input type="text" id="focusTime" value="25" min="1" max="180" readonly onclick="openKeypad('focusTime', 1, 180)">
-            </div>
-            <div class="setting">
-                <label>Break (min)</label>
-                <input type="text" id="breakTime" value="5" min="1" max="60" readonly onclick="openKeypad('breakTime', 1, 60)">
-            </div>
-        </div>
-
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-value" id="completedPomodoros">0</div>
-                <div>Completed</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value" id="totalFocusTime">0</div>
-                <div>Focus (min)</div>
+            <div class="stats" id="timerStats">
+                <div class="stat">
+                    <div class="stat-value" id="completedPomodoros">0</div>
+                    <div>Completed</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="totalFocusTime">0</div>
+                    <div>Focus (min)</div>
+                </div>
             </div>
         </div>
     </div>
@@ -671,26 +684,29 @@
         // Toggle display mode
         function setDisplayMode(mode) {
             displayMode = mode;
-            const circleLayout = document.getElementById('circleLayout');
+            const mainCircleLayout = document.getElementById('mainCircleLayout');
             const timerControls = document.getElementById('timerControls');
+            const timerStats = document.getElementById('timerStats');
             if (mode === 'digital') {
                 timerDisplay.classList.add('digital');
                 timerText.classList.add('seconds');
                 circleModeBtn.classList.remove('active');
                 digitalModeBtn.classList.add('active');
                 // Remove circle layout, stack vertically
-                circleLayout.classList.remove('circle-layout');
-                circleLayout.style.flexDirection = 'column';
+                mainCircleLayout.classList.remove('circle-layout');
+                mainCircleLayout.style.flexDirection = 'column';
                 timerControls.style.flexDirection = 'row';
+                timerStats.style.flexDirection = 'row';
             } else {
                 timerDisplay.classList.remove('digital');
                 timerText.classList.remove('seconds');
                 circleModeBtn.classList.add('active');
                 digitalModeBtn.classList.remove('active');
-                // Apply circle layout - timer on left, buttons on right
-                circleLayout.classList.add('circle-layout');
-                circleLayout.style.flexDirection = 'row';
+                // Apply circle layout - timer on left, buttons and stats on right
+                mainCircleLayout.classList.add('circle-layout');
+                mainCircleLayout.style.flexDirection = 'row';
                 timerControls.style.flexDirection = 'column';
+                timerStats.style.flexDirection = 'column';
             }
             updateDisplay();
         }

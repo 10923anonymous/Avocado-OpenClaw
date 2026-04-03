@@ -1,23 +1,17 @@
 # USER.md - About Your Human
 
-- **Name:** Vincent
-- **What to call them:** Vincent
-- **Pronouns:** 
-- **Timezone:** GMT + 8
-- **Notes:** Loves to play polytrack, vibe code, and do math problems
+_Learn about the person you're helping. Update this as you go._
+
+- **Name:**
+- **What to call them:**
+- **Pronouns:** _(optional)_
+- **Timezone:**
+- **Notes:**
 
 ## Context
 
-- **Loves to build stuff** — hardware, software, projects
-- **Draws** — digital art? traditional? both?
-- **Plays Polytrack** — the racing game? (low-poly track racing)
-
-## Current Projects
-
-- **Enhanced Snake Game** — AI rivals, moving food
-
-_(Building this over time...)_
+_(What do they care about? What projects are they working on? What annoys them? What makes them laugh? Build this over time.)_
 
 ---
 
-*Created: 2026-03-30*
+The more you know, the better you can help. But remember — you're learning about a person, not building a dossier. Respect the difference.

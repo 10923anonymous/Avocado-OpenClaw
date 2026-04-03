@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🥑 Avocado Flappy</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="ui-overlay">
+            <div class="score-display">
+                <span class="score-label">Score</span>
+                <span class="score-value" id="score">0</span>
+            </div>
+            <div class="best-display">
+                <span class="best-label">Best</span>
+                <span class="best-value" id="best">0</span>
+            </div>
+        </div>
+        
+        <div class="start-screen" id="startScreen">
+            <h1 class="title">🥑 Avocado Flappy</h1>
+            <p class="subtitle">Tap, click, or press space to fly!</p>
+            <button class="btn-primary" id="startBtn">Start Game</button>
+            <button class="btn-secondary" id="customizeBtn">🎨 Customize</button>
+        </div>
+        
+        <div class="game-over-screen hidden" id="gameOverScreen">
+            <h2 class="game-over-title">🥑 Splat!</h2>
+            <div class="final-score">
+                <span class="final-label">Score</span>
+                <span class="final-value" id="finalScore">0</span>
+            </div>
+            <button class="btn-primary" id="restartBtn">Try Again</button>
+            <button class="btn-secondary" id="menuBtn">Main Menu</button>
+        </div>
+        
+        <div class="customize-modal hidden" id="customizeModal">
+            <h2 class="modal-title">🎨 Customize Your Avocado</h2>
+            
+            <div class="customize-section">
+                <h3>Avocado Body</h3>
+                <div class="color-picker">
+                    <label>Skin Color</label>
+                    <input type="color" id="skinColor" value="#2d5016">
+                </div>
+                <div class="color-picker">
+                    <label>Flesh Color</label>
+                    <input type="color" id="fleshColor" value="#e8f5a8">
+                </div>
+                <div class="color-picker">
+                    <label>Pit Color</label>
+                    <input type="color" id="pitColor" value="#4a3728">
+                </div>
+            </div>
+            
+            <div class="customize-section">
+                <h3>Wings</h3>
+                <div class="wing-styles">
+                    <button class="wing-option active" data-wing="leaf">
+                        <span class="wing-icon">🍃</span>
+                        <span>Leaf</span>
+                    </button>
+                    <button class="wing-option" data-wing="angel">
+                        <span class="wing-icon">👼</span>
+                        <span>Angel</span>
+                    </button>
+                    <button class="wing-option" data-wing="bat">
+                        <span class="wing-icon">🦇</span>
+                        <span>Bat</span>
+                    </button>
+                    <button class="wing-option" data-wing="butterfly">
+                        <span class="wing-icon">🦋</span>
+                        <span>Butterfly</span>
+                    </button>
+                </div>
+                <div class="color-picker">
+                    <label>Wing Color</label>
+                    <input type="color" id="wingColor" value="#90c040">
+                </div>
+            </div>
+            
+            <div class="customize-section">
+                <h3>Giant Avocados (Pillars)</h3>
+                <div class="color-picker">
+                    <label>Pillar Skin</label>
+                    <input type="color" id="pillarSkinColor" value="#3d6b1f">
+                </div>
+                <div class="color-picker">
+                    <label>Pillar Flesh</label>
+                    <input type="color" id="pillarFleshColor" value="#d4e88c">
+                </div>
+            </div>
+            
+            <div class="customize-section">
+                <h3>Banana Chainsaws</h3>
+                <div class="color-picker">
+                    <label>Banana Color</label>
+                    <input type="color" id="bananaColor" value="#ffe135">
+                </div>
+                <div class="color-picker">
+                    <label>Blade Color</label>
+                    <input type="color" id="bladeColor" value="#c0c0c0">
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="resetCustomize">Reset</button>
+                <button class="btn-primary" id="saveCustomize">Save & Close</button>
+            </div>
+        </div>
+        
+        <div class="controls-hint">
+            <span>Tap / Click / Space to fly</span>
+        </div>
+    </div>
+    
+    <script src="game.js"></script>
+</body>
+</html>
