@@ -9,7 +9,9 @@ const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 // Pre-load audio files
 const splatSound = new Audio('splat.mp3');
+const jumpSound = new Audio('sounds/jump.mp3');
 splatSound.preload = 'auto';
+jumpSound.preload = 'auto';
 
 // Log when audio is loaded
 splatSound.addEventListener('canplaythrough', () => {
@@ -20,21 +22,21 @@ splatSound.addEventListener('error', (e) => {
     console.error('Splat sound failed to load:', e);
 });
 
+jumpSound.addEventListener('canplaythrough', () => {
+    console.log('Jump sound loaded and ready');
+});
+
+jumpSound.addEventListener('error', (e) => {
+    console.error('Jump sound failed to load:', e);
+});
+
 function playJumpSound() {
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(600, audioContext.currentTime + 0.1);
-    
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-    
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.1);
+    // Play the custom jump sound
+    jumpSound.currentTime = 0;
+    const playPromise = jumpSound.play();
+    if (playPromise) {
+        playPromise.catch(e => console.log('Jump audio play failed:', e));
+    }
 }
 
 function playSplatSound() {
