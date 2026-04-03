@@ -47,7 +47,9 @@ class VirtualKeyboard {
                     <div class="vk-alpha-row vk-row-indent2">${row3}</div>
                     <div class="vk-alpha-row vk-bottom-row">
                         <button class="vk-btn vk-shift ${shiftClass}" data-key="shift">⇧</button>
+                        <button class="vk-btn vk-punct" data-key=",">,</button>
                         <button class="vk-btn vk-space" data-key="space">Space</button>
+                        <button class="vk-btn vk-punct" data-key=".">.</button>
                         <button class="vk-btn vk-backspace" data-key="backspace">⌫</button>
                         <button class="vk-btn vk-enter" data-key="enter">↵</button>
                     </div>
@@ -206,6 +208,13 @@ class VirtualKeyboard {
                     border-color: #c4d600;
                     font-size: 18px;
                     padding: 12px 20px;
+                }
+                
+                .vk-btn.vk-punct {
+                    background: linear-gradient(135deg, rgba(100, 100, 100, 0.5), rgba(80, 80, 80, 0.5));
+                    border-color: rgba(255,255,255,0.4);
+                    font-size: 20px;
+                    min-width: 42px;
                 }
                 
                 @keyframes slideUp {
