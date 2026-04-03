@@ -382,6 +382,35 @@
         .volume-control input {
             width: 60px;
         }
+
+        .music-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+
+        .music-btn {
+            padding: 6px 12px;
+            border: 2px solid #2d5016;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.4);
+            color: #2d5016;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .music-btn:hover {
+            background: #2d5016;
+            color: #fff;
+        }
+
+        .music-btn.active {
+            background: #2d5016;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -404,6 +433,13 @@
             <button class="preset-btn" onclick="setPreset(45, 15)">🎯 45/15</button>
             <button class="preset-btn" onclick="setPreset(50, 10)">⚡ 50/10</button>
             <button class="preset-btn" onclick="setPreset(90, 20)">🚀 90/20</button>
+        </div>
+
+        <div class="music-selector">
+            <button class="music-btn active" id="musicLofi" onclick="setMusic('lofi')">🎵 Lofi</button>
+            <button class="music-btn" id="musicRain" onclick="setMusic('rain')">🌧️ Rain</button>
+            <button class="music-btn" id="musicFire" onclick="setMusic('fire')">🔥 Fire</button>
+            <button class="music-btn" id="musicNone" onclick="setMusic('none')">🔇 None</button>
         </div>
 
         <div class="settings">
@@ -481,15 +517,32 @@
         }
 
         // Audio elements - using low volume (0.2 = 20%)
-        const focusMusic = new Audio('https://10923anonymous.github.io/Avocado-OpenClaw/assets/audio/focus-music.mp3');
+        const lofiMusic = new Audio('https://10923anonymous.github.io/Avocado-OpenClaw/assets/audio/focus-music.mp3');
+        const rainMusic = new Audio('sounds/rain.mp3');
+        const fireMusic = new Audio('sounds/fire.mp3');
         const breakMusic = new Audio('https://10923anonymous.github.io/Avocado-OpenClaw/assets/audio/avocado-music.mp3');
         const bellSound = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
         
+        // Music options
+        const musicOptions = {
+            lofi: lofiMusic,
+            rain: rainMusic,
+            fire: fireMusic,
+            none: null
+        };
+        
+        let currentFocusMusic = 'lofi';
+        let focusMusic = musicOptions[currentFocusMusic];
+        
         // Set initial low volume
-        focusMusic.volume = 0.2;
+        lofiMusic.volume = 0.2;
+        rainMusic.volume = 0.2;
+        fireMusic.volume = 0.2;
         breakMusic.volume = 0.2;
         bellSound.volume = 0.5;
-        focusMusic.loop = true;
+        lofiMusic.loop = true;
+        rainMusic.loop = true;
+        fireMusic.loop = true;
         breakMusic.loop = true;
 
         // Progress ring setup
@@ -714,9 +767,34 @@
         // Volume control
         volumeSlider.addEventListener('input', function() {
             const volume = this.value / 100;
-            focusMusic.volume = volume;
+            lofiMusic.volume = volume;
+            rainMusic.volume = volume;
+            fireMusic.volume = volume;
             breakMusic.volume = volume;
         });
+
+        // Set music type
+        function setMusic(type) {
+            // Stop current focus music if playing
+            if (focusMusic && isRunning && isFocusMode) {
+                focusMusic.pause();
+                focusMusic.currentTime = 0;
+            }
+            
+            // Update current music
+            currentFocusMusic = type;
+            focusMusic = musicOptions[type];
+            
+            // Update button states
+            document.querySelectorAll('.music-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('music' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('active');
+            
+            // Start new music if timer is running in focus mode
+            if (focusMusic && isRunning && isFocusMode) {
+                focusMusic.volume = volumeSlider.value / 100;
+                focusMusic.play();
+            }
+        }
 
         // Settings change handlers
         focusTimeInput.addEventListener('change', function() {
