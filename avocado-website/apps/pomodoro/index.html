@@ -383,10 +383,17 @@
             width: 60px;
         }
 
+        .presets-music-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
         .music-selector {
             display: flex;
             gap: 8px;
-            margin-bottom: 10px;
             justify-content: center;
         }
 
@@ -428,18 +435,20 @@
             <button class="mode-btn" id="digitalMode">🔢 Digital</button>
         </div>
 
-        <div class="presets">
-            <button class="preset-btn" onclick="setPreset(25, 5)">🍅 25/5</button>
-            <button class="preset-btn" onclick="setPreset(45, 15)">🎯 45/15</button>
-            <button class="preset-btn" onclick="setPreset(50, 10)">⚡ 50/10</button>
-            <button class="preset-btn" onclick="setPreset(90, 20)">🚀 90/20</button>
-        </div>
+        <div class="presets-music-row">
+            <div class="presets">
+                <button class="preset-btn" onclick="setPreset(25, 5)">🍅 25/5</button>
+                <button class="preset-btn" onclick="setPreset(45, 15)">🎯 45/15</button>
+                <button class="preset-btn" onclick="setPreset(50, 10)">⚡ 50/10</button>
+                <button class="preset-btn" onclick="setPreset(90, 20)">🚀 90/20</button>
+            </div>
 
-        <div class="music-selector">
-            <button class="music-btn active" id="musicLofi" onclick="setMusic('lofi')">🎵 Lofi</button>
-            <button class="music-btn" id="musicRain" onclick="setMusic('rain')">🌧️ Rain</button>
-            <button class="music-btn" id="musicFire" onclick="setMusic('fire')">🔥 Fire</button>
-            <button class="music-btn" id="musicNone" onclick="setMusic('none')">🔇 None</button>
+            <div class="music-selector">
+                <button class="music-btn active" id="musicLofi" onclick="setMusic('lofi')">🎵 Lofi</button>
+                <button class="music-btn" id="musicRain" onclick="setMusic('rain')">🌧️ Rain</button>
+                <button class="music-btn" id="musicFire" onclick="setMusic('fire')">🔥 Fire</button>
+                <button class="music-btn" id="musicNone" onclick="setMusic('none')">🔇 None</button>
+            </div>
         </div>
 
         <div class="settings">
