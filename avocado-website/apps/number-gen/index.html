@@ -133,8 +133,9 @@
 
             <!-- Name Picker -->
             <div id="name" class="section">
-                <div class="result-display">
+                <div class="result-display" style="flex-direction: column; gap: 10px;">
                     <div class="result-value large" id="nameResult">Enter names below</div>
+                    <button class="btn" id="removeNameBtn" onclick="removePickedName()" style="display: none; background: linear-gradient(135deg, #e74c3c, #c0392b); font-size: 14px; padding: 10px 20px;">🗑️ Remove Name</button>
                 </div>
                 <textarea class="name-list" id="nameList" placeholder="Enter names separated by commas or new lines..." readonly onclick="openKeyboard('nameList')"></textarea>
                 <div class="controls">
@@ -276,15 +277,41 @@
             }, 1500);
         }
 
+        let lastPickedName = null;
+        
         function pickName() {
             const input = document.getElementById('nameList').value;
             const names = input.split(/[\n,]/).map(n => n.trim()).filter(n => n);
             if (names.length === 0) {
                 document.getElementById('nameResult').textContent = 'Enter names first!';
+                document.getElementById('removeNameBtn').style.display = 'none';
+                lastPickedName = null;
                 return;
             }
             const result = names[Math.floor(Math.random() * names.length)];
             document.getElementById('nameResult').textContent = result;
+            document.getElementById('removeNameBtn').style.display = 'inline-block';
+            lastPickedName = result;
+        }
+        
+        function removePickedName() {
+            if (!lastPickedName) return;
+            
+            const nameList = document.getElementById('nameList');
+            const names = nameList.value.split(/[\n,]/).map(n => n.trim()).filter(n => n);
+            
+            // Remove the picked name from the list
+            const index = names.indexOf(lastPickedName);
+            if (index > -1) {
+                names.splice(index, 1);
+                // Update the textarea with remaining names
+                nameList.value = names.join('\n');
+                
+                // Show confirmation
+                document.getElementById('nameResult').textContent = `Removed: ${lastPickedName}`;
+                document.getElementById('removeNameBtn').style.display = 'none';
+                lastPickedName = null;
+            }
         }
 
         function generatePassword() {
