@@ -348,7 +348,7 @@
 
                 <!-- Add Timer Form -->
                 <div class="add-timer-form">
-                    <input type="text" id="timerLabel" placeholder="Label (e.g., Cooking, Workout)" style="flex: 2;">
+                    <input type="text" id="timerLabel" placeholder="Label (e.g., Cooking, Workout)" style="flex: 2;" readonly onclick="openKeyboard('timerLabel')">
                     <div class="time-inputs">
                         <input type="text" id="timerMin" placeholder="Min" min="0" max="999" readonly onclick="openKeypad('timerMin', 0, 999)">
                         <input type="text" id="timerSec" placeholder="Sec" min="0" max="59" readonly onclick="openKeypad('timerSec', 0, 59)">
@@ -387,6 +387,7 @@
     </div>
 
     <script src="../virtual-keypad.js"></script>
+    <script src="../virtual-keyboard.js"></script>
     <script>
         // Timer State
         let timers = [];
@@ -401,6 +402,7 @@
 
         // Virtual Keypad
         let currentKeypad = null;
+        let currentKeyboard = null;
         let activeInputId = null;
 
         function openKeypad(inputId, minVal, maxVal) {
@@ -423,6 +425,25 @@
             });
             
             currentKeypad.open(input, currentValue);
+        }
+
+        function openKeyboard(inputId, options = {}) {
+            activeInputId = inputId;
+            const input = document.getElementById(inputId);
+            const currentValue = input ? input.value : '';
+            
+            currentKeyboard = new VirtualKeyboard({
+                maxLength: options.maxLength,
+                onInput: (value) => {
+                    if (input) input.value = value;
+                },
+                onClose: () => {
+                    currentKeyboard = null;
+                    activeInputId = null;
+                }
+            });
+            
+            currentKeyboard.open(input, currentValue);
         }
 
         // Mode Switching
