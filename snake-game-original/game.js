@@ -300,6 +300,15 @@ let direction;
 let nextDirection;
 /** @type {{ kind: "egg" | "human"; x: number; y: number }} */
 let food;
+
+// Snake poop system
+/** @type {{ x: number; y: number; createdAt: number; decomposed: boolean }[]} */
+let poops = [];
+let poopSpawnTimeout = null;
+const POOP_SPAWN_DELAY = 20000; // 20 seconds after eating
+const POOP_DECOMPOSE_TIME = 29000; // 29 seconds total lifetime
+const POOP_EAT_PENALTY = 3; // Score penalty for eating poop
+
 let score;
 let highScore = 0;
 let isGameOver;
@@ -538,6 +547,13 @@ function resetGameState() {
   direction = { x: 1, y: 0 };
   nextDirection = { x: 1, y: 0 };
 
+  // Clear poops and poop timeout
+  poops = [];
+  if (poopSpawnTimeout) {
+    clearTimeout(poopSpawnTimeout);
+    poopSpawnTimeout = null;
+  }
+
   initAISnakes();
   food = randomFoodPosition();
 }
@@ -565,6 +581,7 @@ function tick() {
   }
 
   const ateFood = newHead.x === food.x && newHead.y === food.y;
+  const atePoop = checkPoopCollision(newHead);
 
   snake.unshift(newHead);
   if (ateFood) {
@@ -573,11 +590,19 @@ function tick() {
     scoreValueEl.textContent = String(score);
     food = randomFoodPosition();
 
+    // Schedule poop spawn after 20 seconds
+    schedulePoopSpawn();
+
     const nextTickMs = Math.max(minTickMs, tickMs - tickStepMs);
     if (nextTickMs !== tickMs) {
       tickMs = nextTickMs;
       startGameLoop();
     }
+  } else if (atePoop) {
+    // Eating poop: snake grows (don't pop), but lose points
+    score = Math.max(0, score - POOP_EAT_PENALTY);
+    scoreValueEl.textContent = String(score);
+    // Poop is removed in checkPoopCollision
   } else {
     snake.pop();
   }
@@ -629,6 +654,10 @@ function isCollision(head) {
         return true;
       }
     }
+  }
+  // Check collision with poop (treat as obstacle)
+  if (isPoopAt(head.x, head.y)) {
+    return true;
   }
   return false;
 }
@@ -879,11 +908,96 @@ function randomFoodPosition() {
   while (true) {
     const x = Math.floor(Math.random() * tileCount);
     const y = Math.floor(Math.random() * tileCount);
-    if (isWall(x, y) || isCellOccupiedByAnySnake(x, y)) {
+    if (isWall(x, y) || isCellOccupiedByAnySnake(x, y) || isPoopAt(x, y)) {
       continue;
     }
     return { kind, x, y };
   }
+}
+
+// Poop system functions
+function schedulePoopSpawn() {
+  // Clear any existing timeout
+  if (poopSpawnTimeout) {
+    clearTimeout(poopSpawnTimeout);
+  }
+  // Schedule poop to spawn after 20 seconds
+  poopSpawnTimeout = setTimeout(() => {
+    spawnPoop();
+  }, POOP_SPAWN_DELAY);
+}
+
+function spawnPoop() {
+  if (isGameOver) return;
+  
+  const tail = snake[snake.length - 1];
+  const poop = {
+    x: tail.x,
+    y: tail.y,
+    createdAt: Date.now(),
+    decomposed: false
+  };
+  poops.push(poop);
+  
+  // Schedule decomposition after 29 seconds
+  setTimeout(() => {
+    decomposePoop(poop);
+  }, POOP_DECOMPOSE_TIME);
+  
+  draw();
+}
+
+function decomposePoop(poop) {
+  const index = poops.indexOf(poop);
+  if (index > -1) {
+    poops.splice(index, 1);
+    if (!isGameOver) {
+      draw();
+    }
+  }
+}
+
+function isPoopAt(x, y) {
+  return poops.some(p => p.x === x && p.y === y);
+}
+
+function checkPoopCollision(head) {
+  const index = poops.findIndex(p => p.x === head.x && p.y === head.y);
+  if (index > -1) {
+    // Remove the eaten poop
+    poops.splice(index, 1);
+    return true;
+  }
+  return false;
+}
+
+function drawPoops() {
+  for (const poop of poops) {
+    drawPoop(poop.x, poop.y);
+  }
+}
+
+function drawPoop(tileX, tileY) {
+  const x = tileX * tileSize;
+  const y = tileY * tileSize;
+  const cx = x + tileSize / 2;
+  const cy = y + tileSize / 2;
+  const r = tileSize * 0.35;
+  
+  // Draw poop emoji style
+  ctx.fillStyle = "#5d4037";
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Add some detail
+  ctx.fillStyle = "#3e2723";
+  ctx.beginPath();
+  ctx.arc(cx - r * 0.3, cy - r * 0.2, r * 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(cx + r * 0.2, cy + r * 0.1, r * 0.15, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 function draw() {
@@ -891,6 +1005,7 @@ function draw() {
   drawWalls();
   drawAISnakes();
   drawSnake();
+  drawPoops();
   drawPickup();
 }
 
