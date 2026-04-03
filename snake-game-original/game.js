@@ -917,27 +917,33 @@ function randomFoodPosition() {
 
 // Poop system functions
 function schedulePoopSpawn() {
-  // Clear any existing timeout
-  if (poopSpawnTimeout) {
-    clearTimeout(poopSpawnTimeout);
-  }
-  // Schedule poop to spawn after 20 seconds
-  poopSpawnTimeout = setTimeout(() => {
-    spawnPoop();
+  // Capture tail position at time of eating
+  const tailX = snake[snake.length - 1].x;
+  const tailY = snake[snake.length - 1].y;
+  
+  console.log("Poop scheduled at tail position:", tailX, tailY, "- will spawn in", POOP_SPAWN_DELAY, "ms");
+  
+  // Schedule poop to spawn after 20 seconds at the captured position
+  setTimeout(() => {
+    console.log("Poop spawning now at:", tailX, tailY);
+    spawnPoopAt(tailX, tailY);
   }, POOP_SPAWN_DELAY);
 }
 
-function spawnPoop() {
-  if (isGameOver) return;
+function spawnPoopAt(x, y) {
+  if (isGameOver) {
+    console.log("Poop spawn cancelled - game is over");
+    return;
+  }
   
-  const tail = snake[snake.length - 1];
   const poop = {
-    x: tail.x,
-    y: tail.y,
+    x: x,
+    y: y,
     createdAt: Date.now(),
     decomposed: false
   };
   poops.push(poop);
+  console.log("Poop spawned at:", x, y, "Total poops:", poops.length);
   
   // Schedule decomposition after 29 seconds
   setTimeout(() => {
