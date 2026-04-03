@@ -36,7 +36,25 @@
         .checkbox-group { display: flex; align-items: center; gap: 5px; }
         .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
         .checkbox-group label { font-size: 13px; cursor: pointer; }
-        .coin { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #ffd700, #ffed4e); border: 4px solid #b8860b; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; color: #b8860b; margin: 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .coin-container { width: 100px; height: 100px; margin: 0 auto; perspective: 1000px; }
+        .coin { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.1s; }
+        .coin.flipping { animation: coinFlip 1.5s ease-out forwards; }
+        @keyframes coinFlip {
+            0% { transform: rotateY(0) scale(1); }
+            10% { transform: rotateY(180deg) scale(1.1); }
+            20% { transform: rotateY(360deg) scale(1); }
+            30% { transform: rotateY(540deg) scale(1.1); }
+            40% { transform: rotateY(720deg) scale(1); }
+            50% { transform: rotateY(900deg) scale(1.1); }
+            60% { transform: rotateY(1080deg) scale(1); }
+            70% { transform: rotateY(1260deg) scale(1.1); }
+            80% { transform: rotateY(1440deg) scale(1); }
+            90% { transform: rotateY(1620deg) scale(1.05); }
+            100% { transform: rotateY(1800deg) scale(1); }
+        }
+        .coin-face { position: absolute; width: 100%; height: 100%; border-radius: 50%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .coin-heads { background: linear-gradient(135deg, #ffd700, #ffed4e); border: 4px solid #b8860b; color: #b8860b; transform: rotateY(0deg); }
+        .coin-tails { background: linear-gradient(135deg, #c0c0c0, #e0e0e0); border: 4px solid #808080; color: #555; transform: rotateY(180deg); }
         .dice-display { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
         .die { width: 60px; height: 60px; background: #fff; border: 3px solid #333; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #333; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
     </style>
@@ -101,7 +119,12 @@
             <!-- Coin Flip -->
             <div id="coin" class="section">
                 <div class="result-display">
-                    <div class="coin" id="coinDisplay">?</div>
+                    <div class="coin-container">
+                        <div class="coin" id="coinDisplay">
+                            <div class="coin-face coin-heads">H</div>
+                            <div class="coin-face coin-tails">T</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="controls">
                     <button class="btn primary" onclick="flipCoin()">Flip Coin</button>
@@ -202,13 +225,35 @@
             document.getElementById('numberResult').textContent = result;
         }
 
+        // Coin flip sound
+        const coinSound = new Audio('https://www.soundjay.com/misc/sounds/coin-flip-1.mp3');
+        
         function flipCoin() {
-            const isHeads = Math.random() < 0.5;
             const coin = document.getElementById('coinDisplay');
-            coin.textContent = isHeads ? 'H' : 'T';
-            coin.style.background = isHeads 
-                ? 'linear-gradient(135deg, #ffd700, #ffed4e)' 
-                : 'linear-gradient(135deg, #c0c0c0, #e0e0e0)';
+            const isHeads = Math.random() < 0.5;
+            
+            // Play sound
+            coinSound.currentTime = 0;
+            coinSound.play().catch(e => console.log('Audio play failed:', e));
+            
+            // Remove any previous result class
+            coin.classList.remove('heads', 'tails');
+            
+            // Start animation
+            coin.classList.add('flipping');
+            
+            // After animation completes, show result
+            setTimeout(() => {
+                coin.classList.remove('flipping');
+                // Set final rotation based on result
+                if (isHeads) {
+                    coin.style.transform = 'rotateY(1800deg)';
+                    coin.classList.add('heads');
+                } else {
+                    coin.style.transform = 'rotateY(1980deg)';
+                    coin.classList.add('tails');
+                }
+            }, 1500);
         }
 
         function pickName() {
