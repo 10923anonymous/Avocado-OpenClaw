@@ -350,8 +350,8 @@
                 <div class="add-timer-form">
                     <input type="text" id="timerLabel" placeholder="Label (e.g., Cooking, Workout)" style="flex: 2;">
                     <div class="time-inputs">
-                        <input type="number" id="timerMin" placeholder="Min" min="0" max="999">
-                        <input type="number" id="timerSec" placeholder="Sec" min="0" max="59">
+                        <input type="text" id="timerMin" placeholder="Min" min="0" max="999" readonly onclick="openKeypad('timerMin', 0, 999)">
+                        <input type="text" id="timerSec" placeholder="Sec" min="0" max="59" readonly onclick="openKeypad('timerSec', 0, 59)">
                     </div>
                     <button class="add-btn" onclick="addTimer()">Add</button>
                 </div>
@@ -386,6 +386,7 @@
         </div>
     </div>
 
+    <script src="../virtual-keypad.js"></script>
     <script>
         // Timer State
         let timers = [];
@@ -397,6 +398,32 @@
         let stopwatchTime = 0;
         let stopwatchInterval = null;
         let laps = [];
+
+        // Virtual Keypad
+        let currentKeypad = null;
+        let activeInputId = null;
+
+        function openKeypad(inputId, minVal, maxVal) {
+            activeInputId = inputId;
+            const input = document.getElementById(inputId);
+            const currentValue = input.value || '';
+            
+            currentKeypad = new VirtualKeypad({
+                allowDecimal: false,
+                allowNegative: false,
+                minValue: minVal,
+                maxValue: maxVal,
+                onInput: (value) => {
+                    if (input) input.value = value;
+                },
+                onClose: () => {
+                    currentKeypad = null;
+                    activeInputId = null;
+                }
+            });
+            
+            currentKeypad.open(input, currentValue);
+        }
 
         // Mode Switching
         function showMode(mode) {

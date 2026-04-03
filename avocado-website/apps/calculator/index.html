@@ -639,16 +639,18 @@
                             <button class="keypad-btn" onclick="keypadInput('7')">7</button>
                             <button class="keypad-btn" onclick="keypadInput('8')">8</button>
                             <button class="keypad-btn" onclick="keypadInput('9')">9</button>
+                            <button class="keypad-btn" onclick="keypadBackspace()" style="background: linear-gradient(135deg, rgba(255, 107, 53, 0.6), rgba(231, 76, 60, 0.6)); border-color: #ff6b35;">⌫</button>
                             <button class="keypad-btn" onclick="keypadInput('4')">4</button>
                             <button class="keypad-btn" onclick="keypadInput('5')">5</button>
                             <button class="keypad-btn" onclick="keypadInput('6')">6</button>
+                            <button class="keypad-btn" onclick="keypadClear()" style="background: linear-gradient(135deg, rgba(231, 76, 60, 0.7), rgba(192, 57, 43, 0.7)); border-color: #e74c3c;">C</button>
                             <button class="keypad-btn" onclick="keypadInput('1')">1</button>
                             <button class="keypad-btn" onclick="keypadInput('2')">2</button>
                             <button class="keypad-btn" onclick="keypadInput('3')">3</button>
-                            <button class="keypad-btn" onclick="keypadInput('.')">.</button>
+                            <button class="keypad-btn" onclick="keypadEnter()" style="background: linear-gradient(135deg, #90c040, #6b9c2e); border-color: #c4d600; grid-row: span 2;">↵</button>
+                            <button class="keypad-btn" onclick="toggleConvSign()" style="background: linear-gradient(135deg, rgba(139, 69, 19, 0.6), rgba(160, 82, 45, 0.6)); border-color: #8b4513; font-size: 14px;">+/-</button>
                             <button class="keypad-btn" onclick="keypadInput('0')">0</button>
-                            <button class="keypad-btn" onclick="toggleConvSign()">+/-</button>
-                            <button class="keypad-btn clear" onclick="keypadClear()">C</button>
+                            <button class="keypad-btn" onclick="keypadInput('.')">.</button>
                         </div>
                     </div>
                     <div class="right-panel">
@@ -898,6 +900,24 @@
             convInputValue = '';
             document.getElementById('numberViewer').textContent = '0';
             document.getElementById('resultValue').textContent = '0';
+        }
+
+        function keypadBackspace() {
+            if (convInputValue.length > 1) {
+                convInputValue = convInputValue.slice(0, -1);
+            } else {
+                convInputValue = '';
+            }
+            convert();
+        }
+
+        function keypadEnter() {
+            // Just a visual confirmation - the conversion happens live
+            const keypad = document.getElementById('keypad');
+            keypad.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                keypad.style.transform = 'scale(1)';
+            }, 100);
         }
 
         // Fullscreen functions

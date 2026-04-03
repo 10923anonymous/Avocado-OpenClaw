@@ -77,7 +77,7 @@
                 </div>
                 <div class="input-group">
                     <label>Custom D</label>
-                    <input type="number" id="customDice" value="6" min="2" max="1000">
+                    <input type="text" id="customDice" value="6" min="2" max="1000" readonly onclick="openKeypad('customDice', {allowDecimal: false, allowNegative: false, minValue: 2, maxValue: 1000})">
                     <button class="btn" onclick="rollCustomDice()">Roll</button>
                 </div>
             </div>
@@ -89,9 +89,9 @@
                 </div>
                 <div class="input-group">
                     <label>Min:</label>
-                    <input type="number" id="minNum" value="1">
+                    <input type="text" id="minNum" value="1" readonly onclick="openKeypad('minNum', {allowDecimal: false, allowNegative: true})">
                     <label>Max:</label>
-                    <input type="number" id="maxNum" value="100">
+                    <input type="text" id="maxNum" value="100" readonly onclick="openKeypad('maxNum', {allowDecimal: false, allowNegative: true})">
                 </div>
                 <div class="controls">
                     <button class="btn primary" onclick="generateNumber()">Generate Number</button>
@@ -126,7 +126,7 @@
                 </div>
                 <div class="input-group">
                     <label>Length:</label>
-                    <input type="number" id="passLength" value="16" min="4" max="64">
+                    <input type="text" id="passLength" value="16" min="4" max="64" readonly onclick="openKeypad('passLength', {allowDecimal: false, allowNegative: false, minValue: 4, maxValue: 64})">
                 </div>
                 <div class="password-options">
                     <div class="checkbox-group">
@@ -153,7 +153,31 @@
         </div>
     </div>
 
+    <script src="../virtual-keypad.js"></script>
     <script>
+        // Virtual Keypad helper
+        let currentKeypad = null;
+
+        function openKeypad(inputId, options = {}) {
+            const input = document.getElementById(inputId);
+            const currentValue = input ? input.value : '';
+            
+            currentKeypad = new VirtualKeypad({
+                allowDecimal: options.allowDecimal !== false,
+                allowNegative: options.allowNegative !== false,
+                minValue: options.minValue,
+                maxValue: options.maxValue,
+                onInput: (value) => {
+                    if (input) input.value = value;
+                },
+                onClose: () => {
+                    currentKeypad = null;
+                }
+            });
+            
+            currentKeypad.open(input, currentValue);
+        }
+
         function showTab(tab) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));

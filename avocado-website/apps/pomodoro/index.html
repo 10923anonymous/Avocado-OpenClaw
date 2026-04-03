@@ -115,8 +115,8 @@
         }
 
         .timer-display {
-            width: 320px;
-            height: 160px;
+            width: 280px;
+            height: 280px;
             border-radius: 50%;
             background: linear-gradient(135deg, rgba(255, 225, 53, 0.3), rgba(144, 192, 64, 0.3));
             border: 5px solid #2d5016;
@@ -139,8 +139,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 310px;
-            height: 150px;
+            width: 260px;
+            height: 260px;
             transform: translate(-50%, -50%) rotate(-90deg);
             pointer-events: none;
         }
@@ -154,18 +154,18 @@
             height: 100%;
         }
 
-        .progress-ring-ellipse {
+        .progress-ring-circle {
             fill: none;
-            stroke: #ffe135;
-            stroke-width: 8;
+            stroke: #90c040;
+            stroke-width: 10;
             stroke-linecap: round;
             transition: stroke-dashoffset 1s linear;
-            filter: drop-shadow(0 0 5px rgba(255, 225, 53, 0.8));
+            filter: drop-shadow(0 0 5px rgba(144, 192, 64, 0.8));
         }
 
-        .timer-display.break .progress-ring-ellipse {
-            stroke: #2d5016;
-            filter: drop-shadow(0 0 5px rgba(45, 80, 22, 0.8));
+        .timer-display.break .progress-ring-circle {
+            stroke: #ffe135;
+            filter: drop-shadow(0 0 5px rgba(255, 225, 53, 0.8));
         }
 
         .timer-display.digital {
@@ -231,6 +231,30 @@
             display: flex;
             gap: 10px;
             margin-bottom: 10px;
+        }
+
+        .circle-layout {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            width: 100%;
+        }
+
+        .circle-layout .timer-display {
+            margin-bottom: 0;
+        }
+
+        .circle-layout .controls {
+            flex-direction: column;
+            margin-bottom: 0;
+            gap: 12px;
+        }
+
+        .circle-layout .controls .btn {
+            width: 100px;
+            padding: 12px 0;
         }
 
         .btn {
@@ -369,31 +393,33 @@
             <button class="preset-btn" onclick="setPreset(90, 20)">🚀 90/20</button>
         </div>
 
-        <div class="timer-display" id="timerDisplay">
-            <div class="progress-ring" id="progressRing">
-                <svg viewBox="0 0 310 150" preserveAspectRatio="none">
-                    <ellipse class="progress-ring-ellipse" id="progressEllipse" cx="155" cy="75" rx="150" ry="70"/>
-                </svg>
+        <div class="circle-layout" id="circleLayout">
+            <div class="timer-display" id="timerDisplay">
+                <div class="progress-ring" id="progressRing">
+                    <svg viewBox="0 0 260 260" preserveAspectRatio="none">
+                        <circle class="progress-ring-circle" id="progressCircle" cx="130" cy="130" r="120"/>
+                    </svg>
+                </div>
+                <div class="timer-text" id="timerText">25:00</div>
+                <div class="timer-label" id="timerLabel">Focus Time</div>
             </div>
-            <div class="timer-text" id="timerText">25:00</div>
-            <div class="timer-label" id="timerLabel">Focus Time</div>
-        </div>
 
-        <div class="controls">
-            <button class="btn btn-primary" id="startBtn">Start</button>
-            <button class="btn btn-secondary" id="pauseBtn" style="display:none;">Pause</button>
-            <button class="btn btn-secondary" id="resetBtn">Reset</button>
-            <button class="btn btn-skip" id="skipBtn">Skip ⏭</button>
+            <div class="controls" id="timerControls">
+                <button class="btn btn-primary" id="startBtn">Start</button>
+                <button class="btn btn-secondary" id="pauseBtn" style="display:none;">Pause</button>
+                <button class="btn btn-secondary" id="resetBtn">Reset</button>
+                <button class="btn btn-skip" id="skipBtn">Skip ⏭</button>
+            </div>
         </div>
 
         <div class="settings">
             <div class="setting">
                 <label>Focus (min)</label>
-                <input type="number" id="focusTime" value="25" min="1" max="180">
+                <input type="text" id="focusTime" value="25" min="1" max="180" readonly onclick="openKeypad('focusTime', 1, 180)">
             </div>
             <div class="setting">
                 <label>Break (min)</label>
-                <input type="number" id="breakTime" value="5" min="1" max="60">
+                <input type="text" id="breakTime" value="5" min="1" max="60" readonly onclick="openKeypad('breakTime', 1, 60)">
             </div>
         </div>
 
@@ -414,7 +440,33 @@
         <input type="range" id="volumeSlider" min="0" max="100" value="20">
     </div>
 
+    <script src="../virtual-keypad.js"></script>
     <script>
+        // Virtual Keypad helper
+        let currentKeypad = null;
+
+        function openKeypad(inputId, minVal, maxVal) {
+            const input = document.getElementById(inputId);
+            const currentValue = input ? input.value : '';
+            
+            currentKeypad = new VirtualKeypad({
+                allowDecimal: false,
+                allowNegative: false,
+                minValue: minVal,
+                maxValue: maxVal,
+                onInput: (value) => {
+                    if (input) input.value = value;
+                },
+                onClose: () => {
+                    currentKeypad = null;
+                    // Trigger change event for the app logic
+                    if (input) input.dispatchEvent(new Event('change'));
+                }
+            });
+            
+            currentKeypad.open(input, currentValue);
+        }
+
         // Audio elements - using low volume (0.2 = 20%)
         const focusMusic = new Audio('https://10923anonymous.github.io/Avocado-OpenClaw/assets/audio/focus-music.mp3');
         const breakMusic = new Audio('https://10923anonymous.github.io/Avocado-OpenClaw/assets/audio/avocado-music.mp3');
@@ -428,14 +480,11 @@
         breakMusic.loop = true;
 
         // Progress ring setup
-        const progressEllipse = document.getElementById('progressEllipse');
-        const rx = 150;
-        const ry = 70;
-        // Approximate ellipse circumference using Ramanujan approximation
-        const h = Math.pow(rx - ry, 2) / Math.pow(rx + ry, 2);
-        const circumference = Math.PI * (rx + ry) * (1 + (3 * h) / (10 + Math.sqrt(4 - 3 * h)));
-        progressEllipse.style.strokeDasharray = `${circumference} ${circumference}`;
-        progressEllipse.style.strokeDashoffset = 0;
+        const progressCircle = document.getElementById('progressCircle');
+        const radius = 120;
+        const circumference = 2 * Math.PI * radius;
+        progressCircle.style.strokeDasharray = `${circumference} ${circumference}`;
+        progressCircle.style.strokeDashoffset = 0;
 
         // Timer state
         let timeLeft = 25 * 60; // seconds
@@ -499,7 +548,7 @@
                 ? parseInt(focusTimeInput.value) * 60 
                 : parseInt(breakTimeInput.value) * 60;
             const offset = circumference - (timeLeft / totalTime) * circumference;
-            progressEllipse.style.strokeDashoffset = offset;
+            progressCircle.style.strokeDashoffset = offset;
         }
 
         // Switch between focus and break modes
@@ -601,7 +650,7 @@
             breakMusic.pause();
             breakMusic.currentTime = 0;
             // Reset progress ring
-            progressEllipse.style.strokeDashoffset = 0;
+            progressCircle.style.strokeDashoffset = 0;
             updateDisplay();
         }
 
@@ -615,23 +664,33 @@
             timerLabel.textContent = 'Focus Time';
             timerDisplay.classList.remove('break');
             // Reset progress ring
-            progressEllipse.style.strokeDashoffset = 0;
+            progressCircle.style.strokeDashoffset = 0;
             updateDisplay();
         }
 
         // Toggle display mode
         function setDisplayMode(mode) {
             displayMode = mode;
+            const circleLayout = document.getElementById('circleLayout');
+            const timerControls = document.getElementById('timerControls');
             if (mode === 'digital') {
                 timerDisplay.classList.add('digital');
                 timerText.classList.add('seconds');
                 circleModeBtn.classList.remove('active');
                 digitalModeBtn.classList.add('active');
+                // Remove circle layout, stack vertically
+                circleLayout.classList.remove('circle-layout');
+                circleLayout.style.flexDirection = 'column';
+                timerControls.style.flexDirection = 'row';
             } else {
                 timerDisplay.classList.remove('digital');
                 timerText.classList.remove('seconds');
                 circleModeBtn.classList.add('active');
                 digitalModeBtn.classList.remove('active');
+                // Apply circle layout - timer on left, buttons on right
+                circleLayout.classList.add('circle-layout');
+                circleLayout.style.flexDirection = 'row';
+                timerControls.style.flexDirection = 'column';
             }
             updateDisplay();
         }
