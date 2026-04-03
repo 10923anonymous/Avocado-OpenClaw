@@ -338,12 +338,18 @@
         <div class="content">
             <!-- Timer Section -->
             <div class="timer-section" id="timerSection">
-                <!-- Preset Buttons -->
+                <!-- Preset Buttons & Sound Selector -->
                 <div class="presets">
                     <button class="preset-btn" onclick="addPresetTimer(1, '1 Minute')">1 min</button>
                     <button class="preset-btn" onclick="addPresetTimer(5, '5 Minutes')">5 min</button>
                     <button class="preset-btn" onclick="addPresetTimer(10, '10 Minutes')">10 min</button>
                     <button class="preset-btn" onclick="addPresetTimer(30, '30 Minutes')">30 min</button>
+                    <select id="alarmSound" class="preset-btn" style="background: linear-gradient(135deg, #8b4513, #a0522d); min-width: 100px;">
+                        <option value="bell">🔔 Bell</option>
+                        <option value="digital">📟 Digital</option>
+                        <option value="gentle">🎵 Gentle</option>
+                        <option value="loud">📢 Loud</option>
+                    </select>
                 </div>
 
                 <!-- Add Timer Form -->
@@ -393,6 +399,47 @@
         let timers = [];
         let timerInterval = null;
         let timerIdCounter = 0;
+        let currentAlarm = null;
+
+        // Alarm sounds using Web Audio API
+        const alarmSounds = {
+            bell: () => {
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZURE');
+                audio.loop = true;
+                return audio;
+            },
+            digital: () => {
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZURE');
+                audio.loop = true;
+                return audio;
+            },
+            gentle: () => {
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZURE');
+                audio.loop = true;
+                return audio;
+            },
+            loud: () => {
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZURE');
+                audio.loop = true;
+                audio.volume = 1.0;
+                return audio;
+            }
+        };
+
+        function playAlarm() {
+            stopAlarm();
+            const soundType = document.getElementById('alarmSound').value;
+            currentAlarm = alarmSounds[soundType]();
+            currentAlarm.play().catch(e => console.log('Audio play failed:', e));
+        }
+
+        function stopAlarm() {
+            if (currentAlarm) {
+                currentAlarm.pause();
+                currentAlarm.currentTime = 0;
+                currentAlarm = null;
+            }
+        }
 
         // Stopwatch State
         let stopwatchRunning = false;
@@ -529,6 +576,9 @@
                 else if (timer.finished) cardClass = 'finished';
                 else if (!timer.running && timer.remainingSeconds < timer.totalSeconds) cardClass = 'paused';
                 
+                const stopAlarmBtn = timer.finished ? 
+                    `<button class="control-btn" onclick="stopAlarm(); renderTimers();" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">🔔</button>` : ''
+                
                 return `
                     <div class="timer-card ${cardClass}">
                         <div class="timer-info">
@@ -542,6 +592,7 @@
                                 `<button class="control-btn btn-pause" onclick="pauseTimer(${timer.id})">⏸</button>` : ''}
                             ${!timer.running && timer.remainingSeconds < timer.totalSeconds && !timer.finished ? 
                                 `<button class="control-btn btn-reset" onclick="resetTimer(${timer.id})">↺</button>` : ''}
+                            ${stopAlarmBtn}
                             <button class="control-btn btn-delete" onclick="deleteTimer(${timer.id})">✕</button>
                         </div>
                     </div>
@@ -560,7 +611,7 @@
                         if (timer.remainingSeconds === 0) {
                             timer.finished = true;
                             timer.running = false;
-                            // Play sound or vibrate could be added here
+                            playAlarm();
                         }
                     }
                 });
@@ -595,6 +646,10 @@
                 timer.running = false;
                 timer.finished = false;
                 timer.remainingSeconds = timer.totalSeconds;
+                // Stop alarm if this was the finished timer
+                if (!timers.some(t => t.finished && t.id !== id)) {
+                    stopAlarm();
+                }
                 renderTimers();
             }
         }
@@ -604,6 +659,10 @@
             if (timers.length === 0 && timerInterval) {
                 clearInterval(timerInterval);
                 timerInterval = null;
+            }
+            // Stop alarm if no finished timers remain
+            if (!timers.some(t => t.finished)) {
+                stopAlarm();
             }
             renderTimers();
         }
