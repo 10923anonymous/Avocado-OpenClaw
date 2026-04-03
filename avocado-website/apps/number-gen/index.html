@@ -171,6 +171,7 @@
                 </div>
                 <div class="controls">
                     <button class="btn primary" onclick="generatePassword()">Generate Password</button>
+                    <button class="btn" id="copyBtn" onclick="copyPassword()" style="background: linear-gradient(135deg, #3498db, #2980b9); display: none;">📋 Copy</button>
                 </div>
             </div>
         </div>
@@ -290,6 +291,41 @@
                 password += chars.charAt(Math.floor(Math.random() * chars.length));
             }
             document.getElementById('passwordResult').textContent = password;
+            document.getElementById('copyBtn').style.display = 'inline-block';
+        }
+
+        function copyPassword() {
+            const password = document.getElementById('passwordResult').textContent;
+            if (password === 'Click Generate' || password === 'Select at least one option!') return;
+            
+            navigator.clipboard.writeText(password).then(() => {
+                const btn = document.getElementById('copyBtn');
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Copied!';
+                btn.style.background = 'linear-gradient(135deg, #90c040, #6b9c2e)';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = 'linear-gradient(135deg, #3498db, #2980b9)';
+                }, 1500);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = password;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    const btn = document.getElementById('copyBtn');
+                    btn.textContent = '✓ Copied!';
+                    setTimeout(() => btn.textContent = '📋 Copy', 1500);
+                } catch (e) {
+                    console.error('Fallback copy failed:', e);
+                }
+                document.body.removeChild(textarea);
+            });
         }
 
         // Fullscreen functions
