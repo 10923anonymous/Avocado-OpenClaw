@@ -413,14 +413,77 @@
             }
         }
 
-        // Custom bell sound
+        // Custom bell sound - louder and more reliable
         const customBellSound = new Audio('sounds/bell.mp3');
         customBellSound.preload = 'auto';
+        customBellSound.volume = 1.0; // Max volume
+        
+        // Ensure audio context is ready
+        let bellAudioContext = null;
+        
+        function initBellAudio() {
+            if (!bellAudioContext) {
+                bellAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            // Resume audio context if suspended (needed for some browsers/devices)
+            if (bellAudioContext.state === 'suspended') {
+                bellAudioContext.resume();
+            }
+        }
         
         function playBellSound() {
+            initBellAudio();
+            
+            // Play the MP3 bell sound
             customBellSound.currentTime = 0;
-            customBellSound.play().catch(e => console.log('Bell sound play failed:', e));
+            customBellSound.volume = 1.0;
+            
+            // Try to play and handle any errors
+            const playPromise = customBellSound.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(e => {
+                    console.log('Bell sound play failed:', e);
+                    // Fallback to oscillator-based bell if MP3 fails
+                    playFallbackBell();
+                });
+            }
+            
             return { oscillator: null, gainNode: null };
+        }
+        
+        // Fallback bell sound using Web Audio API (more reliable on embedded devices)
+        function playFallbackBell() {
+            if (!bellAudioContext) return;
+            
+            const oscillator = bellAudioContext.createOscillator();
+            const gainNode = bellAudioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(bellAudioContext.destination);
+            
+            // Bell-like sound: sine wave with frequency modulation
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(523.25, bellAudioContext.currentTime); // C5
+            oscillator.frequency.exponentialRampToValueAtTime(523.25, bellAudioContext.currentTime + 0.1);
+            
+            // Louder volume
+            gainNode.gain.setValueAtTime(0.8, bellAudioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, bellAudioContext.currentTime + 2.0);
+            
+            oscillator.start(bellAudioContext.currentTime);
+            oscillator.stop(bellAudioContext.currentTime + 2.0);
+            
+            // Add a second tone for richer bell sound
+            const osc2 = bellAudioContext.createOscillator();
+            const gain2 = bellAudioContext.createGain();
+            osc2.connect(gain2);
+            gain2.connect(bellAudioContext.destination);
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(659.25, bellAudioContext.currentTime); // E5
+            gain2.gain.setValueAtTime(0.5, bellAudioContext.currentTime);
+            gain2.gain.exponentialRampToValueAtTime(0.01, bellAudioContext.currentTime + 1.5);
+            osc2.start(bellAudioContext.currentTime + 0.1);
+            osc2.stop(bellAudioContext.currentTime + 1.6);
         }
 
         function playDigitalSound() {
@@ -436,9 +499,10 @@
             oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
             oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.2);
             
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            // Louder volume
+            gainNode.gain.setValueAtTime(0.6, audioContext.currentTime);
             gainNode.gain.setValueAtTime(0, audioContext.currentTime + 0.1);
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime + 0.2);
+            gainNode.gain.setValueAtTime(0.6, audioContext.currentTime + 0.2);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
             
             oscillator.start(audioContext.currentTime);
@@ -460,8 +524,9 @@
             oscillator.frequency.linearRampToValueAtTime(554, audioContext.currentTime + 0.3);
             oscillator.frequency.linearRampToValueAtTime(659, audioContext.currentTime + 0.6);
             
-            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.3);
+            // Louder volume
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.6, audioContext.currentTime + 0.3);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2);
             
             oscillator.start(audioContext.currentTime);
@@ -482,9 +547,10 @@
             oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
             oscillator.frequency.linearRampToValueAtTime(1200, audioContext.currentTime + 0.2);
             
-            gainNode.gain.setValueAtTime(0.8, audioContext.currentTime);
+            // Maximum volume
+            gainNode.gain.setValueAtTime(1.0, audioContext.currentTime);
             gainNode.gain.setValueAtTime(0, audioContext.currentTime + 0.1);
-            gainNode.gain.setValueAtTime(0.8, audioContext.currentTime + 0.15);
+            gainNode.gain.setValueAtTime(1.0, audioContext.currentTime + 0.15);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
             
             oscillator.start(audioContext.currentTime);
@@ -505,29 +571,52 @@
             const soundType = document.getElementById('alarmSound').value;
             const playSound = alarmSounds[soundType];
             
+            // Initialize audio context first (important for mobile/embedded devices)
+            initAudioContext();
+            initBellAudio();
+            
             // Play immediately
             playSound();
             
-            // Loop the alarm every second
+            // Loop the alarm every 1.5 seconds (slightly longer to avoid overlap)
             alarmInterval = setInterval(() => {
                 if (timers.some(t => t.finished)) {
                     playSound();
                 } else {
                     stopAlarm();
                 }
-            }, 1000);
+            }, 1500);
         }
 
         function stopAlarm() {
+            // Stop the interval
             if (alarmInterval) {
                 clearInterval(alarmInterval);
                 alarmInterval = null;
             }
+            
+            // Stop any playing oscillator
             if (currentOscillator) {
                 try {
                     currentOscillator.stop();
                 } catch (e) {}
                 currentOscillator = null;
+            }
+            
+            // Stop the MP3 bell sound
+            if (customBellSound) {
+                customBellSound.pause();
+                customBellSound.currentTime = 0;
+            }
+            
+            // Stop any audio context sources
+            if (audioContext && audioContext.state === 'running') {
+                // Suspend audio context to stop all sounds
+                audioContext.suspend().catch(e => console.log('Audio suspend failed:', e));
+            }
+            
+            if (bellAudioContext && bellAudioContext.state === 'running') {
+                bellAudioContext.suspend().catch(e => console.log('Bell audio suspend failed:', e));
             }
         }
 
@@ -667,7 +756,7 @@
                 else if (!timer.running && timer.remainingSeconds < timer.totalSeconds) cardClass = 'paused';
                 
                 const stopAlarmBtn = timer.finished ? 
-                    `<button class="control-btn" onclick="stopAlarm(); renderTimers();" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">🔔</button>` : ''
+                    `<button class="control-btn" onclick="stopAlarmForTimer(${timer.id})" style="background: linear-gradient(135deg, #e74c3c, #c0392b); animation: pulse 0.5s infinite;">🔔</button>` : ''
                 
                 return `
                     <div class="timer-card ${cardClass}">
@@ -694,6 +783,7 @@
             if (timerInterval) return;
             timerInterval = setInterval(() => {
                 let anyRunning = false;
+                let justFinished = false;
                 timers.forEach(timer => {
                     if (timer.running && timer.remainingSeconds > 0) {
                         timer.remainingSeconds--;
@@ -701,12 +791,16 @@
                         if (timer.remainingSeconds === 0) {
                             timer.finished = true;
                             timer.running = false;
-                            playAlarm();
+                            justFinished = true;
                         }
                     }
                 });
+                // Play alarm if any timer just finished
+                if (justFinished) {
+                    playAlarm();
+                }
                 renderTimers();
-                if (!anyRunning) {
+                if (!anyRunning && !timers.some(t => t.finished)) {
                     clearInterval(timerInterval);
                     timerInterval = null;
                 }
@@ -744,14 +838,30 @@
             }
         }
 
+        function stopAlarmForTimer(id) {
+            const timer = timers.find(t => t.id === id);
+            if (timer) {
+                timer.finished = false; // Mark as not finished so alarm stops
+                timer.remainingSeconds = timer.totalSeconds; // Reset to original time
+            }
+            // Stop alarm if no finished timers remain
+            if (!timers.some(t => t.finished)) {
+                stopAlarm();
+            }
+            renderTimers();
+        }
+
         function deleteTimer(id) {
+            const timer = timers.find(t => t.id === id);
+            const wasFinished = timer && timer.finished;
+            
             timers = timers.filter(t => t.id !== id);
             if (timers.length === 0 && timerInterval) {
                 clearInterval(timerInterval);
                 timerInterval = null;
             }
-            // Stop alarm if no finished timers remain
-            if (!timers.some(t => t.finished)) {
+            // Stop alarm if no finished timers remain or if we deleted a finished timer
+            if (wasFinished || !timers.some(t => t.finished)) {
                 stopAlarm();
             }
             renderTimers();
