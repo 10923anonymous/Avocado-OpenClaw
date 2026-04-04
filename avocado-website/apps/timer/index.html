@@ -572,6 +572,14 @@
             return { oscillator, gainNode };
         }
 
+        // Sound durations in milliseconds
+        const soundDurations = {
+            bell: 3500,      // MP3 is ~3s, give extra time
+            digital: 600,    // Digital beep
+            gentle: 2200,    // Gentle chime
+            loud: 600        // Loud alarm
+        };
+
         const alarmSounds = {
             bell: playBellSound,
             digital: playDigitalSound,
@@ -583,30 +591,36 @@
             stopAlarm();
             const soundType = document.getElementById('alarmSound').value;
             const playSound = alarmSounds[soundType];
+            const duration = soundDurations[soundType];
             
             // Initialize audio context first (important for mobile/embedded devices)
             initAudioContext();
             initBellAudio();
             
-            // Play immediately
-            playSound();
-            
-            // Loop the alarm - wait for sound to finish before repeating
-            // Bell MP3 is ~3 seconds, so we wait 4 seconds to ensure it completes
-            const loopInterval = soundType === 'bell' ? 4000 : 2500;
-            alarmInterval = setInterval(() => {
-                if (timers.some(t => t.finished)) {
-                    playSound();
-                } else {
+            // Function to play sound and schedule next
+            function playAndSchedule() {
+                if (!timers.some(t => t.finished)) {
                     stopAlarm();
+                    return;
                 }
-            }, loopInterval);
+                
+                // Play the sound
+                playSound();
+                
+                // Schedule next play after this sound finishes
+                alarmInterval = setTimeout(() => {
+                    playAndSchedule();
+                }, duration);
+            }
+            
+            // Start the loop
+            playAndSchedule();
         }
 
         function stopAlarm() {
-            // Stop the interval
+            // Stop the timeout (we now use timeout instead of interval)
             if (alarmInterval) {
-                clearInterval(alarmInterval);
+                clearTimeout(alarmInterval);
                 alarmInterval = null;
             }
             
