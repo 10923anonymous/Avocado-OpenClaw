@@ -417,6 +417,12 @@
         const customBellSound = new Audio('sounds/bell.mp3');
         customBellSound.preload = 'auto';
         customBellSound.volume = 1.0; // Max volume
+        let isBellPlaying = false;
+        
+        // Track when bell finishes playing
+        customBellSound.addEventListener('ended', () => {
+            isBellPlaying = false;
+        });
         
         // Ensure audio context is ready
         let bellAudioContext = null;
@@ -432,17 +438,24 @@
         }
         
         function playBellSound() {
+            // Don't play if already playing (prevents cutting off)
+            if (isBellPlaying) {
+                return { oscillator: null, gainNode: null };
+            }
+            
             initBellAudio();
             
             // Play the MP3 bell sound
             customBellSound.currentTime = 0;
             customBellSound.volume = 1.0;
+            isBellPlaying = true;
             
             // Try to play and handle any errors
             const playPromise = customBellSound.play();
             if (playPromise !== undefined) {
                 playPromise.catch(e => {
                     console.log('Bell sound play failed:', e);
+                    isBellPlaying = false;
                     // Fallback to oscillator-based bell if MP3 fails
                     playFallbackBell();
                 });
@@ -578,14 +591,16 @@
             // Play immediately
             playSound();
             
-            // Loop the alarm every 1.5 seconds (slightly longer to avoid overlap)
+            // Loop the alarm - wait for sound to finish before repeating
+            // Bell MP3 is ~3 seconds, so we wait 4 seconds to ensure it completes
+            const loopInterval = soundType === 'bell' ? 4000 : 2500;
             alarmInterval = setInterval(() => {
                 if (timers.some(t => t.finished)) {
                     playSound();
                 } else {
                     stopAlarm();
                 }
-            }, 1500);
+            }, loopInterval);
         }
 
         function stopAlarm() {
@@ -608,6 +623,7 @@
                 customBellSound.pause();
                 customBellSound.currentTime = 0;
             }
+            isBellPlaying = false;
             
             // Stop any audio context sources
             if (audioContext && audioContext.state === 'running') {
