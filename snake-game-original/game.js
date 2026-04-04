@@ -19,221 +19,116 @@ let tileCount = 20;
 const canvasSize = canvas.width; // assume square
 let tileSize = canvasSize / tileCount;
 
-// Color customization system
+// Default colors (used for reset)
 const DEFAULT_COLORS = {
-  bg: "#020617",
-  grid: "rgba(255, 255, 255, 0.16)",
   snakeHead: "#22c55e",
   snakeBody: "#16a34a",
   wall: "#f97316",
-  aiRivals: [
-    { head: "#a855f7", body: "#7c3aed" },
-    { head: "#d946ef", body: "#a21caf" },
-    { head: "#c084fc", body: "#9333ea" },
-  ],
-  aiObstacles: [
-    { head: "#38bdf8", body: "#0284c7" },
-    { head: "#fbbf24", body: "#ca8a04" },
-    { head: "#f472b6", body: "#db2777" },
-  ]
+  eggFood: "#f5f0dc",
+  humanFood: "#3b82f6",
+  aiRival1Head: "#a855f7",
+  aiRival1Body: "#7c3aed",
+  aiRival2Head: "#d946ef",
+  aiRival2Body: "#a21caf",
+  aiRival3Head: "#c084fc",
+  aiRival3Body: "#9333ea",
+  aiObs1Head: "#38bdf8",
+  aiObs1Body: "#0284c7",
+  aiObs2Head: "#fbbf24",
+  aiObs2Body: "#ca8a04",
+  aiObs3Head: "#f472b6",
+  aiObs3Body: "#db2777",
 };
 
-// Load colors from localStorage or use defaults
-function loadCustomColors() {
-  try {
-    const stored = localStorage.getItem("snakeCustomColors");
-    if (stored) {
-      return JSON.parse(stored);
-    }
-  } catch (e) {
-    console.log("Failed to load custom colors:", e);
-  }
-  return JSON.parse(JSON.stringify(DEFAULT_COLORS));
-}
+// Current colors (can be customized)
+let snakeHeadColor = DEFAULT_COLORS.snakeHead;
+let snakeBodyColor = DEFAULT_COLORS.snakeBody;
+let wallColor = DEFAULT_COLORS.wall;
+let eggFoodColor = DEFAULT_COLORS.eggFood;
+let humanFoodColor = DEFAULT_COLORS.humanFood;
 
-// Save colors to localStorage
-function saveCustomColors(colors) {
-  try {
-    localStorage.setItem("snakeCustomColors", JSON.stringify(colors));
-  } catch (e) {
-    console.log("Failed to save custom colors:", e);
-  }
-}
+const bgColor = "#020617";
+const gridColor = "rgba(255, 255, 255, 0.16)";
 
-// Reset colors to defaults
-function resetColors() {
-  customColors = JSON.parse(JSON.stringify(DEFAULT_COLORS));
-  saveCustomColors(customColors);
-  updateColorVariables();
-  draw();
-  updateColorPickerUI();
-}
+const AI_RIVAL_PALETTE = [
+  { head: DEFAULT_COLORS.aiRival1Head, body: DEFAULT_COLORS.aiRival1Body },
+  { head: DEFAULT_COLORS.aiRival2Head, body: DEFAULT_COLORS.aiRival2Body },
+  { head: DEFAULT_COLORS.aiRival3Head, body: DEFAULT_COLORS.aiRival3Body },
+];
+const AI_OBSTACLE_PALETTE = [
+  { head: DEFAULT_COLORS.aiObs1Head, body: DEFAULT_COLORS.aiObs1Body },
+  { head: DEFAULT_COLORS.aiObs2Head, body: DEFAULT_COLORS.aiObs2Body },
+  { head: DEFAULT_COLORS.aiObs3Head, body: DEFAULT_COLORS.aiObs3Body },
+];
 
-// Update color variables from customColors
-let customColors = loadCustomColors();
+// Background settings
+let backgroundMode = "meadow"; // "meadow", "solid", "gradient"
+let bgColor1 = "#020617";
+let bgColor2 = "#1e293b";
 
-let bgColor = customColors.bg;
-let gridColor = customColors.grid;
-let snakeHeadColor = customColors.snakeHead;
-let snakeBodyColor = customColors.snakeBody;
-let wallColor = customColors.wall;
-let AI_RIVAL_PALETTE = customColors.aiRivals;
-let AI_OBSTACLE_PALETTE = customColors.aiObstacles;
-
-function updateColorVariables() {
-  bgColor = customColors.bg;
-  gridColor = customColors.grid;
-  snakeHeadColor = customColors.snakeHead;
-  snakeBodyColor = customColors.snakeBody;
-  wallColor = customColors.wall;
-  AI_RIVAL_PALETTE = customColors.aiRivals;
-  AI_OBSTACLE_PALETTE = customColors.aiObstacles;
-}
-
-// Color picker UI elements
-let colorPickerPanel = null;
-
-function createColorPickerUI() {
-  // Create color picker button
-  const colorBtn = document.createElement("button");
-  colorBtn.id = "colorPickerBtn";
-  colorBtn.type = "button";
-  colorBtn.className = "game-toggle";
-  colorBtn.textContent = "🎨 Colors";
-  colorBtn.style.marginTop = "10px";
-  colorBtn.addEventListener("click", toggleColorPicker);
-  
-  // Insert after humans toggle
-  const controlsSection = document.querySelector(".game-card");
-  const canvasWrapper = document.querySelector(".canvas-wrapper");
-  controlsSection.insertBefore(colorBtn, canvasWrapper);
-  
-  // Create color picker panel
-  colorPickerPanel = document.createElement("div");
-  colorPickerPanel.id = "colorPickerPanel";
-  colorPickerPanel.className = "color-picker-panel hidden";
-  colorPickerPanel.innerHTML = `
-    <div class="color-section">
-      <h3>Snake Colors</h3>
-      <div class="color-row">
-        <label>Head:</label>
-        <input type="color" id="snakeHeadPicker" value="${customColors.snakeHead}">
-      </div>
-      <div class="color-row">
-        <label>Body:</label>
-        <input type="color" id="snakeBodyPicker" value="${customColors.snakeBody}">
-      </div>
-    </div>
-    <div class="color-section">
-      <h3>Environment</h3>
-      <div class="color-row">
-        <label>Background:</label>
-        <input type="color" id="bgPicker" value="${customColors.bg}">
-      </div>
-      <div class="color-row">
-        <label>Grid:</label>
-        <input type="color" id="gridPicker" value="${customColors.grid.replace('rgba(', '').replace(', 255, 255, 0.16)', '').trim() || '#ffffff'}">
-      </div>
-      <div class="color-row">
-        <label>Walls:</label>
-        <input type="color" id="wallPicker" value="${customColors.wall}">
-      </div>
-    </div>
-    <div class="color-section">
-      <h3>AI Rivals</h3>
-      <div class="color-row">
-        <label>Rival 1 Head:</label>
-        <input type="color" id="rival1HeadPicker" value="${customColors.aiRivals[0].head}">
-      </div>
-      <div class="color-row">
-        <label>Rival 1 Body:</label>
-        <input type="color" id="rival1BodyPicker" value="${customColors.aiRivals[0].body}">
-      </div>
-      <div class="color-row">
-        <label>Rival 2 Head:</label>
-        <input type="color" id="rival2HeadPicker" value="${customColors.aiRivals[1].head}">
-      </div>
-      <div class="color-row">
-        <label>Rival 2 Body:</label>
-        <input type="color" id="rival2BodyPicker" value="${customColors.aiRivals[1].body}">
-      </div>
-      <div class="color-row">
-        <label>Rival 3 Head:</label>
-        <input type="color" id="rival3HeadPicker" value="${customColors.aiRivals[2].head}">
-      </div>
-      <div class="color-row">
-        <label>Rival 3 Body:</label>
-        <input type="color" id="rival3BodyPicker" value="${customColors.aiRivals[2].body}">
-      </div>
-    </div>
-    <div class="color-actions">
-      <button type="button" id="resetColorsBtn" class="game-toggle">Reset to Default</button>
-      <button type="button" id="closeColorsBtn" class="game-toggle">Close</button>
-    </div>
-  `;
-  
-  controlsSection.insertBefore(colorPickerPanel, canvasWrapper);
-  
-  // Add event listeners
-  document.getElementById("snakeHeadPicker").addEventListener("input", (e) => {
-    customColors.snakeHead = e.target.value;
-    updateColorVariables();
-    saveCustomColors(customColors);
-    draw();
-  });
-  
-  document.getElementById("snakeBodyPicker").addEventListener("input", (e) => {
-    customColors.snakeBody = e.target.value;
-    updateColorVariables();
-    saveCustomColors(customColors);
-    draw();
-  });
-  
-  document.getElementById("bgPicker").addEventListener("input", (e) => {
-    customColors.bg = e.target.value;
-    updateColorVariables();
-    saveCustomColors(customColors);
-    draw();
-  });
-  
-  document.getElementById("gridPicker").addEventListener("input", (e) => {
-    const hex = e.target.value;
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    customColors.grid = `rgba(${r}, ${g}, ${b}, 0.16)`;
-    updateColorVariables();
-    saveCustomColors(customColors);
-    draw();
-  });
-  
-  document.getElementById("wallPicker").addEventListener("input", (e) => {
-    customColors.wall = e.target.value;
-    updateColorVariables();
-    saveCustomColors(customColors);
-    draw();
-  });
-  
-  // AI Rival color pickers
-  for (let i = 1; i <= 3; i++) {
-    document.getElementById(`rival${i}HeadPicker`).addEventListener("input", (e) => {
-      customColors.aiRivals[i-1].head = e.target.value;
-      updateColorVariables();
-      saveCustomColors(customColors);
-      draw();
-    });
-    document.getElementById(`rival${i}BodyPicker`).addEventListener("input", (e) => {
-      customColors.aiRivals[i-1].body = e.target.value;
-      updateColorVariables();
-      saveCustomColors(customColors);
-      draw();
-    });
-  }
-  
-  document.getElementById("resetColorsBtn").addEventListener("click", resetColors);
-  document.getElementById("closeColorsBtn").addEventListener("click", toggleColorPicker);
-}
-
+// Color presets
+const COLOR_PRESETS = {
+  classic: {
+    snakeHead: "#22c55e", snakeBody: "#16a34a", wall: "#f97316",
+    eggFood: "#f5f0dc", humanFood: "#3b82f6",
+    aiRival1Head: "#a855f7", aiRival1Body: "#7c3aed",
+    aiRival2Head: "#d946ef", aiRival2Body: "#a21caf",
+    aiRival3Head: "#c084fc", aiRival3Body: "#9333ea",
+    aiObs1Head: "#38bdf8", aiObs1Body: "#0284c7",
+    aiObs2Head: "#fbbf24", aiObs2Body: "#ca8a04",
+    aiObs3Head: "#f472b6", aiObs3Body: "#db2777",
+  },
+  neon: {
+    snakeHead: "#00ff00", snakeBody: "#00cc00", wall: "#ff00ff",
+    eggFood: "#ffff00", humanFood: "#00ffff",
+    aiRival1Head: "#ff00ff", aiRival1Body: "#cc00cc",
+    aiRival2Head: "#ff0080", aiRival2Body: "#cc0066",
+    aiRival3Head: "#ff80ff", aiRival3Body: "#cc66cc",
+    aiObs1Head: "#00ffff", aiObs1Body: "#00cccc",
+    aiObs2Head: "#ffff00", aiObs2Body: "#cccc00",
+    aiObs3Head: "#ff8000", aiObs3Body: "#cc6600",
+  },
+  retro: {
+    snakeHead: "#00ff41", snakeBody: "#00cc33", wall: "#ff3333",
+    eggFood: "#ffff33", humanFood: "#3333ff",
+    aiRival1Head: "#ff33ff", aiRival1Body: "#cc33cc",
+    aiRival2Head: "#ff6633", aiRival2Body: "#cc6633",
+    aiRival3Head: "#ff99ff", aiRival3Body: "#cc99cc",
+    aiObs1Head: "#33ffff", aiObs1Body: "#33cccc",
+    aiObs2Head: "#ffff33", aiObs2Body: "#cccc33",
+    aiObs3Head: "#ff9933", aiObs3Body: "#cc9933",
+  },
+  ocean: {
+    snakeHead: "#20b2aa", snakeBody: "#008b8b", wall: "#4682b4",
+    eggFood: "#f0e68c", humanFood: "#1e90ff",
+    aiRival1Head: "#4169e1", aiRival1Body: "#0000cd",
+    aiRival2Head: "#00ced1", aiRival2Body: "#20b2aa",
+    aiRival3Head: "#87ceeb", aiRival3Body: "#6495ed",
+    aiObs1Head: "#48d1cc", aiObs1Body: "#40e0d0",
+    aiObs2Head: "#b0e0e6", aiObs2Body: "#add8e6",
+    aiObs3Head: "#5f9ea0", aiObs3Body: "#008b8b",
+  },
+  fire: {
+    snakeHead: "#ff4500", snakeBody: "#ff6347", wall: "#8b0000",
+    eggFood: "#ffd700", humanFood: "#ff8c00",
+    aiRival1Head: "#dc143c", aiRival1Body: "#b22222",
+    aiRival2Head: "#ff1493", aiRival2Body: "#c71585",
+    aiRival3Head: "#ff69b4", aiRival3Body: "#db7093",
+    aiObs1Head: "#ffa500", aiObs1Body: "#ff8c00",
+    aiObs2Head: "#ffd700", aiObs2Body: "#daa520",
+    aiObs3Head: "#ff6347", aiObs3Body: "#ff4500",
+  },
+  black: {
+    snakeHead: "#1a1a1a", snakeBody: "#0d0d0d", wall: "#333333",
+    eggFood: "#f5f5f5", humanFood: "#4a4a4a",
+    aiRival1Head: "#2d2d2d", aiRival1Body: "#1f1f1f",
+    aiRival2Head: "#3d3d3d", aiRival2Body: "#2a2a2a",
+    aiRival3Head: "#4d4d4d", aiRival3Body: "#363636",
+    aiObs1Head: "#525252", aiObs1Body: "#404040",
+    aiObs2Head: "#616161", aiObs2Body: "#505050",
+    aiObs3Head: "#707070", aiObs3Body: "#606060",
+  },
+};
 
 // Irregular wall templates (normalized [x, y]); placed randomly each round
 const WALL_SHAPE_TEMPLATES = [
@@ -300,15 +195,6 @@ let direction;
 let nextDirection;
 /** @type {{ kind: "egg" | "human"; x: number; y: number }} */
 let food;
-
-// Snake poop system
-/** @type {{ x: number; y: number; createdAt: number; decomposed: boolean }[]} */
-let poops = [];
-let poopSpawnTimeout = null;
-const POOP_SPAWN_DELAY = 20000; // 20 seconds after eating
-const POOP_DECOMPOSE_TIME = 29000; // 29 seconds total lifetime
-const POOP_EAT_PENALTY = 3; // Score penalty for eating poop
-
 let score;
 let highScore = 0;
 let isGameOver;
@@ -547,13 +433,6 @@ function resetGameState() {
   direction = { x: 1, y: 0 };
   nextDirection = { x: 1, y: 0 };
 
-  // Clear poops and poop timeout
-  poops = [];
-  if (poopSpawnTimeout) {
-    clearTimeout(poopSpawnTimeout);
-    poopSpawnTimeout = null;
-  }
-
   initAISnakes();
   food = randomFoodPosition();
 }
@@ -581,7 +460,6 @@ function tick() {
   }
 
   const ateFood = newHead.x === food.x && newHead.y === food.y;
-  const atePoop = checkPoopCollision(newHead);
 
   snake.unshift(newHead);
   if (ateFood) {
@@ -590,19 +468,11 @@ function tick() {
     scoreValueEl.textContent = String(score);
     food = randomFoodPosition();
 
-    // Schedule poop spawn after 20 seconds
-    schedulePoopSpawn();
-
     const nextTickMs = Math.max(minTickMs, tickMs - tickStepMs);
     if (nextTickMs !== tickMs) {
       tickMs = nextTickMs;
       startGameLoop();
     }
-  } else if (atePoop) {
-    // Eating poop: snake grows (don't pop), but lose points
-    score = Math.max(0, score - POOP_EAT_PENALTY);
-    scoreValueEl.textContent = String(score);
-    // Poop is removed in checkPoopCollision
   } else {
     snake.pop();
   }
@@ -654,10 +524,6 @@ function isCollision(head) {
         return true;
       }
     }
-  }
-  // Check collision with poop (treat as obstacle)
-  if (isPoopAt(head.x, head.y)) {
-    return true;
   }
   return false;
 }
@@ -908,99 +774,11 @@ function randomFoodPosition() {
   while (true) {
     const x = Math.floor(Math.random() * tileCount);
     const y = Math.floor(Math.random() * tileCount);
-    if (isWall(x, y) || isCellOccupiedByAnySnake(x, y) || isPoopAt(x, y)) {
+    if (isWall(x, y) || isCellOccupiedByAnySnake(x, y)) {
       continue;
     }
     return { kind, x, y };
   }
-}
-
-// Poop system functions
-function schedulePoopSpawn() {
-  console.log("Poop scheduled - will spawn at tail position in", POOP_SPAWN_DELAY, "ms");
-  
-  // Schedule poop to spawn after 20 seconds at current tail position
-  setTimeout(() => {
-    spawnPoop();
-  }, POOP_SPAWN_DELAY);
-}
-
-function spawnPoop() {
-  if (isGameOver) {
-    console.log("Poop spawn cancelled - game is over");
-    return;
-  }
-  
-  // Get tail position at time of spawning (20 seconds after eating)
-  const tail = snake[snake.length - 1];
-  const poop = {
-    x: tail.x,
-    y: tail.y,
-    createdAt: Date.now(),
-    decomposed: false
-  };
-  poops.push(poop);
-  console.log("Poop spawned at tail position:", tail.x, tail.y, "Total poops:", poops.length);
-  
-  // Schedule decomposition after 29 seconds
-  setTimeout(() => {
-    decomposePoop(poop);
-  }, POOP_DECOMPOSE_TIME);
-  
-  draw();
-}
-
-function decomposePoop(poop) {
-  const index = poops.indexOf(poop);
-  if (index > -1) {
-    poops.splice(index, 1);
-    if (!isGameOver) {
-      draw();
-    }
-  }
-}
-
-function isPoopAt(x, y) {
-  return poops.some(p => p.x === x && p.y === y);
-}
-
-function checkPoopCollision(head) {
-  const index = poops.findIndex(p => p.x === head.x && p.y === head.y);
-  if (index > -1) {
-    // Remove the eaten poop
-    poops.splice(index, 1);
-    return true;
-  }
-  return false;
-}
-
-function drawPoops() {
-  for (const poop of poops) {
-    drawPoop(poop.x, poop.y);
-  }
-}
-
-function drawPoop(tileX, tileY) {
-  const x = tileX * tileSize;
-  const y = tileY * tileSize;
-  const cx = x + tileSize / 2;
-  const cy = y + tileSize / 2;
-  const r = tileSize * 0.35;
-  
-  // Draw poop emoji style
-  ctx.fillStyle = "#5d4037";
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, Math.PI * 2);
-  ctx.fill();
-  
-  // Add some detail
-  ctx.fillStyle = "#3e2723";
-  ctx.beginPath();
-  ctx.arc(cx - r * 0.3, cy - r * 0.2, r * 0.2, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(cx + r * 0.2, cy + r * 0.1, r * 0.15, 0, Math.PI * 2);
-  ctx.fill();
 }
 
 function draw() {
@@ -1008,7 +786,6 @@ function draw() {
   drawWalls();
   drawAISnakes();
   drawSnake();
-  drawPoops();
   drawPickup();
 }
 
@@ -1027,12 +804,19 @@ function drawCoverImage(targetCtx, img, w, h) {
 }
 
 function drawBackground() {
-  if (meadowBgReady && meadowBg.naturalWidth > 0) {
+  if (backgroundMode === "meadow" && meadowBgReady && meadowBg.naturalWidth > 0) {
     drawCoverImage(ctx, meadowBg, canvasSize, canvasSize);
     ctx.fillStyle = "rgba(0, 28, 10, 0.12)";
     ctx.fillRect(0, 0, canvasSize, canvasSize);
+  } else if (backgroundMode === "gradient") {
+    const grd = ctx.createLinearGradient(0, 0, 0, canvasSize);
+    grd.addColorStop(0, bgColor1);
+    grd.addColorStop(1, bgColor2);
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, canvasSize, canvasSize);
   } else {
-    ctx.fillStyle = bgColor;
+    // solid color
+    ctx.fillStyle = bgColor1;
     ctx.fillRect(0, 0, canvasSize, canvasSize);
   }
 
@@ -1091,18 +875,39 @@ function drawEgg(tileX, tileY) {
   const ry = (tileSize - pad * 2) * 0.48;
 
   ctx.save();
+  // Use custom egg color
+  const baseColor = eggFoodColor || "#f5f0dc";
   const grd = ctx.createRadialGradient(cx - rx * 0.3, cy - ry * 0.35, 0, cx, cy, tileSize * 0.6);
-  grd.addColorStop(0, "#fffef5");
-  grd.addColorStop(0.55, "#f5f0dc");
-  grd.addColorStop(1, "#e8dcc8");
+  grd.addColorStop(0, lightenColor(baseColor, 20));
+  grd.addColorStop(0.55, baseColor);
+  grd.addColorStop(1, darkenColor(baseColor, 10));
   ctx.beginPath();
   ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
   ctx.fillStyle = grd;
   ctx.fill();
-  ctx.strokeStyle = "rgba(90, 70, 50, 0.35)";
+  ctx.strokeStyle = darkenColor(baseColor, 30);
   ctx.lineWidth = Math.max(1, tileSize * 0.06);
   ctx.stroke();
   ctx.restore();
+}
+
+// Helper functions for color manipulation
+function lightenColor(hex, percent) {
+  const num = parseInt(hex.replace("#", ""), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = Math.min(255, (num >> 16) + amt);
+  const G = Math.min(255, ((num >> 8) & 0x00FF) + amt);
+  const B = Math.min(255, (num & 0x0000FF) + amt);
+  return "#" + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+}
+
+function darkenColor(hex, percent) {
+  const num = parseInt(hex.replace("#", ""), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = Math.max(0, (num >> 16) - amt);
+  const G = Math.max(0, ((num >> 8) & 0x00FF) - amt);
+  const B = Math.max(0, (num & 0x0000FF) - amt);
+  return "#" + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
 }
 
 function drawHuman(tileX, tileY) {
@@ -1115,18 +920,20 @@ function drawHuman(tileX, tileY) {
   const hipY = py + s * 0.62;
   const footY = py + s * 0.88;
 
+  const baseColor = humanFoodColor || "#3b82f6";
+
   ctx.save();
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
-  ctx.strokeStyle = "#1e293b";
+  ctx.strokeStyle = darkenColor(baseColor, 40);
   ctx.lineWidth = Math.max(1.2, s * 0.08);
 
-  ctx.fillStyle = "#3b82f6";
+  ctx.fillStyle = baseColor;
   ctx.fillRect(cx - s * 0.12, py + s * 0.4, s * 0.24, s * 0.22);
-  ctx.strokeStyle = "#1e3a5f";
+  ctx.strokeStyle = darkenColor(baseColor, 30);
   ctx.strokeRect(cx - s * 0.12, py + s * 0.4, s * 0.24, s * 0.22);
 
-  ctx.strokeStyle = "#1e293b";
+  ctx.strokeStyle = darkenColor(baseColor, 40);
   ctx.beginPath();
   ctx.moveTo(cx, neckY);
   ctx.lineTo(cx, hipY);
@@ -1144,11 +951,11 @@ function drawHuman(tileX, tileY) {
   ctx.lineTo(cx + s * 0.18, footY);
   ctx.stroke();
 
-  ctx.fillStyle = "#fecaca";
+  ctx.fillStyle = lightenColor(baseColor, 30);
   ctx.beginPath();
   ctx.arc(cx, neckY - headR * 0.2, headR, 0, Math.PI * 2);
   ctx.fill();
-  ctx.strokeStyle = "#1e293b";
+  ctx.strokeStyle = darkenColor(baseColor, 40);
   ctx.stroke();
 
   ctx.restore();
@@ -1273,32 +1080,6 @@ function restartGame() {
   resetGameState();
   draw();
   startGameLoop();
-}
-
-function toggleColorPicker() {
-  if (!colorPickerPanel) {
-    createColorPickerUI();
-  }
-  colorPickerPanel.classList.toggle("hidden");
-}
-
-function updateColorPickerUI() {
-  if (!colorPickerPanel) return;
-  document.getElementById("snakeHeadPicker").value = customColors.snakeHead;
-  document.getElementById("snakeBodyPicker").value = customColors.snakeBody;
-  document.getElementById("bgPicker").value = customColors.bg;
-  const gridMatch = customColors.grid.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-  if (gridMatch) {
-    const r = parseInt(gridMatch[1]).toString(16).padStart(2, '0');
-    const g = parseInt(gridMatch[2]).toString(16).padStart(2, '0');
-    const b = parseInt(gridMatch[3]).toString(16).padStart(2, '0');
-    document.getElementById("gridPicker").value = `#${r}${g}${b}`;
-  }
-  document.getElementById("wallPicker").value = customColors.wall;
-  for (let i = 1; i <= 3; i++) {
-    document.getElementById(`rival${i}HeadPicker`).value = customColors.aiRivals[i-1].head;
-    document.getElementById(`rival${i}BodyPicker`).value = customColors.aiRivals[i-1].body;
-  }
 }
 
 function updateHumansToggleUI() {
@@ -1429,6 +1210,265 @@ function init() {
       draw();
     });
   }
+
+  // Color customization
+  initColorCustomization();
+  
+  // Background customization
+  initBackgroundCustomization();
+}
+
+// Color customization functions
+function initColorCustomization() {
+  // Color pickers
+  const colorPickers = {
+    snakeHeadColor: (v) => { snakeHeadColor = v; draw(); },
+    snakeBodyColor: (v) => { snakeBodyColor = v; draw(); },
+    wallColor: (v) => { wallColor = v; draw(); },
+    eggFoodColor: (v) => { eggFoodColor = v; draw(); },
+    humanFoodColor: (v) => { humanFoodColor = v; draw(); },
+    aiRival1Head: (v) => { AI_RIVAL_PALETTE[0].head = v; draw(); },
+    aiRival1Body: (v) => { AI_RIVAL_PALETTE[0].body = v; draw(); },
+    aiRival2Head: (v) => { AI_RIVAL_PALETTE[1].head = v; draw(); },
+    aiRival2Body: (v) => { AI_RIVAL_PALETTE[1].body = v; draw(); },
+    aiRival3Head: (v) => { AI_RIVAL_PALETTE[2].head = v; draw(); },
+    aiRival3Body: (v) => { AI_RIVAL_PALETTE[2].body = v; draw(); },
+    aiObs1Head: (v) => { AI_OBSTACLE_PALETTE[0].head = v; draw(); },
+    aiObs1Body: (v) => { AI_OBSTACLE_PALETTE[0].body = v; draw(); },
+    aiObs2Head: (v) => { AI_OBSTACLE_PALETTE[1].head = v; draw(); },
+    aiObs2Body: (v) => { AI_OBSTACLE_PALETTE[1].body = v; draw(); },
+    aiObs3Head: (v) => { AI_OBSTACLE_PALETTE[2].head = v; draw(); },
+    aiObs3Body: (v) => { AI_OBSTACLE_PALETTE[2].body = v; draw(); },
+  };
+
+  Object.entries(colorPickers).forEach(([id, setter]) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("input", (e) => setter(e.target.value));
+    }
+  });
+
+  // Preset buttons
+  document.querySelectorAll(".preset-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const preset = btn.dataset.preset;
+      if (preset === "custom") return;
+      applyColorPreset(preset);
+    });
+  });
+
+  // Reset to default button
+  const resetBtn = document.getElementById("resetColorsBtn");
+  if (resetBtn) {
+    resetBtn.addEventListener("click", resetToDefaultColors);
+  }
+
+  // Save/Load preset buttons
+  const saveBtn = document.getElementById("savePresetBtn");
+  if (saveBtn) {
+    saveBtn.addEventListener("click", saveCustomPreset);
+  }
+
+  const loadBtn = document.getElementById("loadPresetBtn");
+  if (loadBtn) {
+    loadBtn.addEventListener("click", loadCustomPreset);
+  }
+}
+
+function applyColorPreset(presetName) {
+  const preset = COLOR_PRESETS[presetName];
+  if (!preset) return;
+
+  snakeHeadColor = preset.snakeHead;
+  snakeBodyColor = preset.snakeBody;
+  wallColor = preset.wall;
+  eggFoodColor = preset.eggFood;
+  humanFoodColor = preset.humanFood;
+
+  AI_RIVAL_PALETTE[0].head = preset.aiRival1Head;
+  AI_RIVAL_PALETTE[0].body = preset.aiRival1Body;
+  AI_RIVAL_PALETTE[1].head = preset.aiRival2Head;
+  AI_RIVAL_PALETTE[1].body = preset.aiRival2Body;
+  AI_RIVAL_PALETTE[2].head = preset.aiRival3Head;
+  AI_RIVAL_PALETTE[2].body = preset.aiRival3Body;
+
+  AI_OBSTACLE_PALETTE[0].head = preset.aiObs1Head;
+  AI_OBSTACLE_PALETTE[0].body = preset.aiObs1Body;
+  AI_OBSTACLE_PALETTE[1].head = preset.aiObs2Head;
+  AI_OBSTACLE_PALETTE[1].body = preset.aiObs2Body;
+  AI_OBSTACLE_PALETTE[2].head = preset.aiObs3Head;
+  AI_OBSTACLE_PALETTE[2].body = preset.aiObs3Body;
+
+  updateColorPickers();
+  draw();
+}
+
+function resetToDefaultColors() {
+  snakeHeadColor = DEFAULT_COLORS.snakeHead;
+  snakeBodyColor = DEFAULT_COLORS.snakeBody;
+  wallColor = DEFAULT_COLORS.wall;
+  eggFoodColor = DEFAULT_COLORS.eggFood;
+  humanFoodColor = DEFAULT_COLORS.humanFood;
+
+  AI_RIVAL_PALETTE[0].head = DEFAULT_COLORS.aiRival1Head;
+  AI_RIVAL_PALETTE[0].body = DEFAULT_COLORS.aiRival1Body;
+  AI_RIVAL_PALETTE[1].head = DEFAULT_COLORS.aiRival2Head;
+  AI_RIVAL_PALETTE[1].body = DEFAULT_COLORS.aiRival2Body;
+  AI_RIVAL_PALETTE[2].head = DEFAULT_COLORS.aiRival3Head;
+  AI_RIVAL_PALETTE[2].body = DEFAULT_COLORS.aiRival3Body;
+
+  AI_OBSTACLE_PALETTE[0].head = DEFAULT_COLORS.aiObs1Head;
+  AI_OBSTACLE_PALETTE[0].body = DEFAULT_COLORS.aiObs1Body;
+  AI_OBSTACLE_PALETTE[1].head = DEFAULT_COLORS.aiObs2Head;
+  AI_OBSTACLE_PALETTE[1].body = DEFAULT_COLORS.aiObs2Body;
+  AI_OBSTACLE_PALETTE[2].head = DEFAULT_COLORS.aiObs3Head;
+  AI_OBSTACLE_PALETTE[2].body = DEFAULT_COLORS.aiObs3Body;
+
+  // Reset background too
+  backgroundMode = "meadow";
+  bgColor1 = "#020617";
+  bgColor2 = "#1e293b";
+  updateBackgroundUI();
+
+  updateColorPickers();
+  draw();
+}
+
+function updateColorPickers() {
+  const ids = [
+    "snakeHeadColor", "snakeBodyColor", "wallColor", "eggFoodColor", "humanFoodColor",
+    "aiRival1Head", "aiRival1Body", "aiRival2Head", "aiRival2Body", "aiRival3Head", "aiRival3Body",
+    "aiObs1Head", "aiObs1Body", "aiObs2Head", "aiObs2Body", "aiObs3Head", "aiObs3Body"
+  ];
+  
+  const values = [
+    snakeHeadColor, snakeBodyColor, wallColor, eggFoodColor, humanFoodColor,
+    AI_RIVAL_PALETTE[0].head, AI_RIVAL_PALETTE[0].body,
+    AI_RIVAL_PALETTE[1].head, AI_RIVAL_PALETTE[1].body,
+    AI_RIVAL_PALETTE[2].head, AI_RIVAL_PALETTE[2].body,
+    AI_OBSTACLE_PALETTE[0].head, AI_OBSTACLE_PALETTE[0].body,
+    AI_OBSTACLE_PALETTE[1].head, AI_OBSTACLE_PALETTE[1].body,
+    AI_OBSTACLE_PALETTE[2].head, AI_OBSTACLE_PALETTE[2].body
+  ];
+
+  ids.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el) el.value = values[i];
+  });
+}
+
+function saveCustomPreset() {
+  const preset = {
+    snakeHead: snakeHeadColor,
+    snakeBody: snakeBodyColor,
+    wall: wallColor,
+    eggFood: eggFoodColor,
+    humanFood: humanFoodColor,
+    aiRival1Head: AI_RIVAL_PALETTE[0].head,
+    aiRival1Body: AI_RIVAL_PALETTE[0].body,
+    aiRival2Head: AI_RIVAL_PALETTE[1].head,
+    aiRival2Body: AI_RIVAL_PALETTE[1].body,
+    aiRival3Head: AI_RIVAL_PALETTE[2].head,
+    aiRival3Body: AI_RIVAL_PALETTE[2].body,
+    aiObs1Head: AI_OBSTACLE_PALETTE[0].head,
+    aiObs1Body: AI_OBSTACLE_PALETTE[0].body,
+    aiObs2Head: AI_OBSTACLE_PALETTE[1].head,
+    aiObs2Body: AI_OBSTACLE_PALETTE[1].body,
+    aiObs3Head: AI_OBSTACLE_PALETTE[2].head,
+    aiObs3Body: AI_OBSTACLE_PALETTE[2].body,
+  };
+  try {
+    window.localStorage.setItem("snakeCustomPreset", JSON.stringify(preset));
+    alert("Preset saved!");
+  } catch (e) {
+    alert("Could not save preset.");
+  }
+}
+
+function loadCustomPreset() {
+  try {
+    const stored = window.localStorage.getItem("snakeCustomPreset");
+    if (stored) {
+      const preset = JSON.parse(stored);
+      snakeHeadColor = preset.snakeHead || DEFAULT_COLORS.snakeHead;
+      snakeBodyColor = preset.snakeBody || DEFAULT_COLORS.snakeBody;
+      wallColor = preset.wall || DEFAULT_COLORS.wall;
+      eggFoodColor = preset.eggFood || DEFAULT_COLORS.eggFood;
+      humanFoodColor = preset.humanFood || DEFAULT_COLORS.humanFood;
+      AI_RIVAL_PALETTE[0].head = preset.aiRival1Head || DEFAULT_COLORS.aiRival1Head;
+      AI_RIVAL_PALETTE[0].body = preset.aiRival1Body || DEFAULT_COLORS.aiRival1Body;
+      AI_RIVAL_PALETTE[1].head = preset.aiRival2Head || DEFAULT_COLORS.aiRival2Head;
+      AI_RIVAL_PALETTE[1].body = preset.aiRival2Body || DEFAULT_COLORS.aiRival2Body;
+      AI_RIVAL_PALETTE[2].head = preset.aiRival3Head || DEFAULT_COLORS.aiRival3Head;
+      AI_RIVAL_PALETTE[2].body = preset.aiRival3Body || DEFAULT_COLORS.aiRival3Body;
+      AI_OBSTACLE_PALETTE[0
+
+].head = preset.aiObs1Head || DEFAULT_COLORS.aiObs1Head;
+      AI_OBSTACLE_PALETTE[0].body = preset.aiObs1Body || DEFAULT_COLORS.aiObs1Body;
+      AI_OBSTACLE_PALETTE[1].head = preset.aiObs2Head || DEFAULT_COLORS.aiObs2Head;
+      AI_OBSTACLE_PALETTE[1].body = preset.aiObs2Body || DEFAULT_COLORS.aiObs2Body;
+      AI_OBSTACLE_PALETTE[2].head = preset.aiObs3Head || DEFAULT_COLORS.aiObs3Head;
+      AI_OBSTACLE_PALETTE[2].body = preset.aiObs3Body || DEFAULT_COLORS.aiObs3Body;
+      updateColorPickers();
+      draw();
+      alert("Preset loaded!");
+    } else {
+      alert("No saved preset found.");
+    }
+  } catch (e) {
+    alert("Could not load preset.");
+  }
+}
+
+// Background customization functions
+function initBackgroundCustomization() {
+  const bgRadios = document.querySelectorAll('input[name="background"]');
+  bgRadios.forEach((radio) => {
+    radio.addEventListener("change", (e) => {
+      backgroundMode = e.target.value;
+      updateBackgroundUI();
+      draw();
+    });
+  });
+
+  const bgColor1Input = document.getElementById("bgColor1");
+  if (bgColor1Input) {
+    bgColor1Input.addEventListener("input", (e) => {
+      bgColor1 = e.target.value;
+      if (backgroundMode !== "meadow") draw();
+    });
+  }
+
+  const bgColor2Input = document.getElementById("bgColor2");
+  if (bgColor2Input) {
+    bgColor2Input.addEventListener("input", (e) => {
+      bgColor2 = e.target.value;
+      if (backgroundMode === "gradient") draw();
+    });
+  }
+}
+
+function updateBackgroundUI() {
+  const bgRadios = document.querySelectorAll('input[name="background"]');
+  bgRadios.forEach((radio) => {
+    radio.checked = radio.value === backgroundMode;
+  });
+
+  const bgControls = document.getElementById("bgColorControls");
+  if (bgControls) {
+    bgControls.style.display = backgroundMode === "meadow" ? "none" : "flex";
+  }
+
+  const bgColor2Item = document.getElementById("bgColor2Item");
+  if (bgColor2Item) {
+    bgColor2Item.style.display = backgroundMode === "gradient" ? "block" : "none";
+  }
+
+  const bgColor1Input = document.getElementById("bgColor1");
+  if (bgColor1Input) bgColor1Input.value = bgColor1;
+
+  const bgColor2Input = document.getElementById("bgColor2");
+  if (bgColor2Input) bgColor2Input.value = bgColor2;
 }
 
 window.addEventListener("keydown", handleKeyDown);
@@ -1437,4 +1477,3 @@ restartButton.addEventListener("click", restartGame);
 window.updateBoardSize = updateBoardSize;
 
 init();
-
