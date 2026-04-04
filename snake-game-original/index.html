@@ -9,7 +9,6 @@
   <body>
     <main class="page">
       <section class="game-card">
-        <a href="https://10923anonymous.github.io/Avocado-OpenClaw/avocado-website/touchscreen.html" class="back-button">← Back</a>
         <h1 class="title">Snake Game</h1>
         <div class="score-row">
           <span id="score-label">Score:</span>
@@ -17,71 +16,208 @@
           <span id="highscore-label">Best:</span>
           <span id="highscore-value">0</span>
         </div>
-        <div class="board-controls">
-          <label for="boardSize" class="board-label">Board</label>
-          <input
-            id="boardSize"
-            class="board-slider"
-            type="range"
-            min="10"
-            max="50"
-            value="20"
-          />
-          <span id="boardSizeValue" class="board-size-value">20×20</span>
+        
+        <!-- Game Settings -->
+        <div class="settings-section">
+          <h2 class="section-title">Game Settings</h2>
+          <div class="board-controls">
+            <label for="boardSize" class="board-label">Board</label>
+            <input
+              id="boardSize"
+              class="board-slider"
+              type="range"
+              min="10"
+              max="50"
+              value="20"
+            />
+            <span id="boardSizeValue" class="board-size-value">20×20</span>
+          </div>
+          <div class="board-controls">
+            <label for="wallCount" class="board-label">Walls</label>
+            <input
+              id="wallCount"
+              class="board-slider"
+              type="range"
+              min="0"
+              max="7"
+              value="3"
+            />
+            <span id="wallCountValue" class="board-size-value">3</span>
+          </div>
+          <div class="board-controls">
+            <label for="aiRivalCount" class="board-label">AI rivals</label>
+            <input
+              id="aiRivalCount"
+              class="board-slider"
+              type="range"
+              min="0"
+              max="3"
+              value="1"
+            />
+            <span id="aiRivalCountValue" class="board-size-value">1</span>
+          </div>
+          <div class="board-controls">
+            <label for="aiObstacleCount" class="board-label">AI obstacles</label>
+            <input
+              id="aiObstacleCount"
+              class="board-slider"
+              type="range"
+              min="0"
+              max="3"
+              value="2"
+            />
+            <span id="aiObstacleCountValue" class="board-size-value">2</span>
+          </div>
+          <div class="board-controls">
+            <label for="humanSpeed" class="board-label">Human speed</label>
+            <input
+              id="humanSpeed"
+              class="board-slider"
+              type="range"
+              min="0"
+              max="3"
+              value="1"
+            />
+            <span id="humanSpeedValue" class="board-size-value">1×</span>
+          </div>
+          <div class="board-controls">
+            <button type="button" id="humansToggle" class="game-toggle">
+              Humans: on
+            </button>
+          </div>
         </div>
-        <div class="board-controls">
-          <label for="wallCount" class="board-label">Walls</label>
-          <input
-            id="wallCount"
-            class="board-slider"
-            type="range"
-            min="0"
-            max="7"
-            value="3"
-          />
-          <span id="wallCountValue" class="board-size-value">3</span>
+
+        <!-- Customization Panel -->
+        <div class="settings-section">
+          <h2 class="section-title">Customize Colors</h2>
+          
+          <div class="color-presets">
+            <button type="button" class="preset-btn" data-preset="classic">Classic</button>
+            <button type="button" class="preset-btn" data-preset="neon">Neon</button>
+            <button type="button" class="preset-btn" data-preset="retro">Retro</button>
+            <button type="button" class="preset-btn" data-preset="ocean">Ocean</button>
+            <button type="button" class="preset-btn" data-preset="fire">Fire</button>
+            <button type="button" class="preset-btn" data-preset="black">Black</button>
+            <button type="button" class="preset-btn" data-preset="custom">Custom</button>
+          </div>
+
+          <div class="color-grid">
+            <div class="color-item">
+              <label for="snakeHeadColor" class="color-label">Your Snake Head</label>
+              <input type="color" id="snakeHeadColor" class="color-picker" value="#22c55e" />
+            </div>
+            <div class="color-item">
+              <label for="snakeBodyColor" class="color-label">Your Snake Body</label>
+              <input type="color" id="snakeBodyColor" class="color-picker" value="#16a34a" />
+            </div>
+            <div class="color-item">
+              <label for="wallColor" class="color-label">Walls</label>
+              <input type="color" id="wallColor" class="color-picker" value="#f97316" />
+            </div>
+            <div class="color-item">
+              <label for="eggFoodColor" class="color-label">Egg Food</label>
+              <input type="color" id="eggFoodColor" class="color-picker" value="#f5f0dc" />
+            </div>
+            <div class="color-item">
+              <label for="humanFoodColor" class="color-label">Human Food</label>
+              <input type="color" id="humanFoodColor" class="color-picker" value="#3b82f6" />
+            </div>
+          </div>
+
+          <div class="ai-colors-section">
+            <h3 class="subsection-title">AI Rival Colors</h3>
+            <div class="color-grid">
+              <div class="color-item">
+                <label for="aiRival1Head" class="color-label">Rival 1 Head</label>
+                <input type="color" id="aiRival1Head" class="color-picker" value="#a855f7" />
+              </div>
+              <div class="color-item">
+                <label for="aiRival1Body" class="color-label">Rival 1 Body</label>
+                <input type="color" id="aiRival1Body" class="color-picker" value="#7c3aed" />
+              </div>
+              <div class="color-item">
+                <label for="aiRival2Head" class="color-label">Rival 2 Head</label>
+                <input type="color" id="aiRival2Head" class="color-picker" value="#d946ef" />
+              </div>
+              <div class="color-item">
+                <label for="aiRival2Body" class="color-label">Rival 2 Body</label>
+                <input type="color" id="aiRival2Body" class="color-picker" value="#a21caf" />
+              </div>
+              <div class="color-item">
+                <label for="aiRival3Head" class="color-label">Rival 3 Head</label>
+                <input type="color" id="aiRival3Head" class="color-picker" value="#c084fc" />
+              </div>
+              <div class="color-item">
+                <label for="aiRival3Body" class="color-label">Rival 3 Body</label>
+                <input type="color" id="aiRival3Body" class="color-picker" value="#9333ea" />
+              </div>
+            </div>
+
+            <h3 class="subsection-title">AI Obstacle Colors</h3>
+            <div class="color-grid">
+              <div class="color-item">
+                <label for="aiObs1Head" class="color-label">Obstacle 1 Head</label>
+                <input type="color" id="aiObs1Head" class="color-picker" value="#38bdf8" />
+              </div>
+              <div class="color-item">
+                <label for="aiObs1Body" class="color-label">Obstacle 1 Body</label>
+                <input type="color" id="aiObs1Body" class="color-picker" value="#0284c7" />
+              </div>
+              <div class="color-item">
+                <label for="aiObs2Head" class="color-label">Obstacle 2 Head</label>
+                <input type="color" id="aiObs2Head" class="color-picker" value="#fbbf24" />
+              </div>
+              <div class="color-item">
+                <label for="aiObs2Body" class="color-label">Obstacle 2 Body</label>
+                <input type="color" id="aiObs2Body" class="color-picker" value="#ca8a04" />
+              </div>
+              <div class="color-item">
+                <label for="aiObs3Head" class="color-label">Obstacle 3 Head</label>
+                <input type="color" id="aiObs3Head" class="color-picker" value="#f472b6" />
+              </div>
+              <div class="color-item">
+                <label for="aiObs3Body" class="color-label">Obstacle 3 Body</label>
+                <input type="color" id="aiObs3Body" class="color-picker" value="#db2777" />
+              </div>
+            </div>
+          </div>
+
+          <div class="customization-actions">
+            <button type="button" id="savePresetBtn" class="action-btn save-btn">Save Preset</button>
+            <button type="button" id="loadPresetBtn" class="action-btn load-btn">Load Preset</button>
+            <button type="button" id="resetColorsBtn" class="action-btn reset-btn">Reset to Default</button>
+          </div>
+
+          <!-- Background Customization -->
+          <div class="background-section">
+            <h3 class="subsection-title">Background</h3>
+            <div class="background-options">
+              <div class="bg-option">
+                <input type="radio" id="bgMeadow" name="background" value="meadow" checked />
+                <label for="bgMeadow">Meadow</label>
+              </div>
+              <div class="bg-option">
+                <input type="radio" id="bgSolid" name="background" value="solid" />
+                <label for="bgSolid">Solid Color</label>
+              </div>
+              <div class="bg-option">
+                <input type="radio" id="bgGradient" name="background" value="gradient" />
+                <label for="bgGradient">Gradient</label>
+              </div>
+            </div>
+            <div class="bg-color-controls" id="bgColorControls" style="display: none;">
+              <div class="color-item">
+                <label for="bgColor1" class="color-label">Background Color 1</label>
+                <input type="color" id="bgColor1" class="color-picker" value="#020617" />
+              </div>
+              <div class="color-item" id="bgColor2Item" style="display: none;">
+                <label for="bgColor2" class="color-label">Background Color 2</label>
+                <input type="color" id="bgColor2" class="color-picker" value="#1e293b" />
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="board-controls">
-          <label for="aiRivalCount" class="board-label">AI rivals</label>
-          <input
-            id="aiRivalCount"
-            class="board-slider"
-            type="range"
-            min="0"
-            max="3"
-            value="1"
-          />
-          <span id="aiRivalCountValue" class="board-size-value">1</span>
-        </div>
-        <div class="board-controls">
-          <label for="aiObstacleCount" class="board-label">AI obstacles</label>
-          <input
-            id="aiObstacleCount"
-            class="board-slider"
-            type="range"
-            min="0"
-            max="3"
-            value="2"
-          />
-          <span id="aiObstacleCountValue" class="board-size-value">2</span>
-        </div>
-        <div class="board-controls">
-          <label for="humanSpeed" class="board-label">Human speed</label>
-          <input
-            id="humanSpeed"
-            class="board-slider"
-            type="range"
-            min="0"
-            max="3"
-            value="1"
-          />
-          <span id="humanSpeedValue" class="board-size-value">1×</span>
-        </div>
-        <div class="board-controls">
-          <button type="button" id="humansToggle" class="game-toggle">
-            Humans: on
-          </button>
-        </div>
+
         <div class="canvas-wrapper">
           <canvas id="gameCanvas" width="400" height="400">
             Your browser does not support the HTML canvas tag.
@@ -101,4 +237,3 @@
     <script src="game.js"></script>
   </body>
 </html>
-
